@@ -38,7 +38,7 @@ export default function FatecJahu() {
 
                         <div className="grid w-[100%] gap-4 grid-cols-[repeat(auto-fit,minmax(350px,1fr))]">
                             {data.map((e, i) => (
-                                <FadeContent blur={true} duration={1000} easing="ease-out" initialOpacity={0}>
+                                <FadeContent blur={true} duration={1000} easing="ease-out" initialOpacity={0} key={i}>
                                     <div className="bg-[#fff3c6] p-5 rounded-[6px]">{e}</div>
                                 </FadeContent>
                             ))}

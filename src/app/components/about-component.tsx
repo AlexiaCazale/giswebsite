@@ -11,7 +11,7 @@ export default function About() {
         "33% ocupam cargos de pesquisa no mundo",
         "áreas como engenharia, IA e dados, a participação cai para cerca de 22–31%",
     ]
-    
+
     return (
         <React.Fragment>
             <div className="flex justify-between bg-[#f7e9e4] h-screen w-screen gap-6 px-16">
@@ -56,9 +56,8 @@ export default function About() {
                     </div>
 
                     <div className="flex gap-4">
-                        {data.map((e) => (
-
-                            <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(255, 0, 93, 0.3)">
+                        {data.map((e, index) => (
+                            <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(255, 0, 93, 0.3)" key={index}>
                                 <p>{e}</p>
                             </SpotlightCard>
                         ))}

@@ -24,8 +24,13 @@ export default function SearchResult() {
                                 <Typography component="span">Objetivos específicos - Ano 1</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                                malesuada lacus ex, sit amet blandit leo lobortis eget.
+                                <li>Identificar o número de mulheres matriculadas nos cursos da Fatec Jahu​</li>
+
+                                <li>Coletar informações com essas estudantes sobre suas percepções em relação a STEM​</li>
+
+                                <li>Identificar as principais barreiras que impedem as mulheres de se interessarem por STEM​</li>
+
+                                <li>Identificar o número de mulheres matriculadas nos cursos da Fatec Jahu​</li>
                             </AccordionDetails>
                         </Accordion>
                         <Accordion>
@@ -37,8 +42,13 @@ export default function SearchResult() {
                                 <Typography component="span">Objetivos específicos - Ano 2</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                                malesuada lacus ex, sit amet blandit leo lobortis eget.
+                                <li>Coletar informações com as estudantes do ensino médio sobre suas percepções em relação a STEM;</li>
+
+                                <li>Identificar as principais barreiras que impedem essas estudantes de se interessarem por STEM;</li>
+
+                                <li>Realizar atividades de capacitação e formação com as estudantes do ensino médio; e</li>
+
+                                <li>Avaliar os resultados obtidos com as estudantes do ensino médio.</li>
                             </AccordionDetails>
                         </Accordion>
                         <Accordion defaultExpanded>

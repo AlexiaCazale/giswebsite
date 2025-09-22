@@ -8,51 +8,61 @@ export default function Member() {
         {
             id: 0,
             name: "Letícia Garcia",
+            description: "Estudante",
             imgUrl: "/members/leticia.jpeg",
         },
         {
             id: 1,
             name: "Aléxia Cazale",
+            description: "Estudante",
             imgUrl: "/members/alexia.jpeg",
         },
         {
             id: 2,
             name: "Júlia Mazoti",
+            description: "Estudante",
             imgUrl: "/members/julia.jpeg",
         },
         {
             id: 3,
             name: "Geovana Cristina",
+            description: "Estudante",
             imgUrl: "/members/geovana.jpeg",
         },
         {
             id: 4,
             name: "Evelyn Cassinotte",
+            description: "Estudante",
             imgUrl: "/members/evelyn.jpeg",
         },
         {
             id: 5,
             name: "Rayssa Maely",
+            description: "Estudante",
             imgUrl: "/members/rayssa.jpeg",
         },
         {
             id: 6,
             name: "Yasmin Sanchez",
+            description: "Estudante",
             imgUrl: "/members/yasmin.jpeg",
         },
         {
             id: 7,
             name: "Brenda Ananias",
+            description: "Estudante",
             imgUrl: "/members/brenda.jpeg",
         },
         {
             id: 8,
             name: "Arthur Henrique",
+            description: "Estudante",
             imgUrl: "/members/arthur.jpeg",
         },
         {
             id: 9,
             name: "Jorge Guilherme",
+            description: "Estudante",
             imgUrl: "/members/jorge.jpeg",
         },
     ];
@@ -70,41 +80,15 @@ export default function Member() {
                 </div>
                 <div className="flex flex-col w-[100%] justify-center gap-6">
                     <h1>Membros</h1>
-                    <div className="grid gap-2 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
+                    <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
                         {membersList.map((member) => (
-                            <PixelTransition
-                                firstContent={
-                                    <img
-                                        src={member.imgUrl} alt={member.name}
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            borderRadius: "50%",
-                                            objectFit: "cover"
-                                        }}
-                                    />
-                                }
-                                secondContent={
-                                    <div
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            borderRadius: "50%",
-                                            display: "grid",
-                                            placeItems: "center",
-                                            justifyContent: "center",
-                                            textAlign: "center",
-                                            backgroundColor: "#a45944"
-                                        }}
-                                    >
-                                        <p style={{ fontWeight: 600, fontSize: "2rem", color: "#ffffff" }}>{member.name}</p>
-                                    </div>
-                                }
-                                gridSize={12}
-                                pixelColor='#ffffff'
-                                animationStepDuration={0.4}
-                                className="custom-pixel-card"
-                            />
+                            <div key={member.id} className="flex flex-col gap-2 items-center justify-center">
+                                <div className="bg-[#a45944] rounded-[50%]">
+                                    <Image src={member.imgUrl} alt={member.name} width={150} height={150} className="rounded-[50%] w-[150px] h-[150px] object-cover  border-l-8 border-[#a45944]" />
+                                </div>
+                                <p><strong>{member.name}</strong></p>
+                                <span>{member.description}</span>
+                            </div>
                         ))}
                     </div>
                 </div>
