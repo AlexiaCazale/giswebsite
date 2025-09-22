@@ -19,6 +19,20 @@ export default function Contact() {
                             placeholder="Digite seu nome"
                             variant="outlined"
                             color="primary"
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    color: "white",
+                                    "& fieldset": {
+                                        borderColor: "white", // cor da borda normal
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: "white", // cor ao passar o mouse
+                                    },
+                                },
+                                "& .MuiInputLabel-root": {
+                                    color: "white", // cor do label mesmo sem foco
+                                },
+                            }}
                         />
                         <TextField
                             required
@@ -27,6 +41,20 @@ export default function Contact() {
                             placeholder="Digite seu e-mail"
                             variant="outlined"
                             color="primary"
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    color: "white",
+                                    "& fieldset": {
+                                        borderColor: "white", // cor da borda normal
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: "white", // cor ao passar o mouse
+                                    },
+                                },
+                                "& .MuiInputLabel-root": {
+                                    color: "white", // cor do label mesmo sem foco
+                                },
+                            }}
                         />
                         <TextField
                             required
@@ -35,6 +63,21 @@ export default function Contact() {
                             placeholder="Escreva sua mensagem"
                             variant="outlined"
                             color="primary"
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    color: "white",
+                                    "& fieldset": {
+                                        borderColor: "white", // cor da borda normal
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: "white", // cor ao passar o mouse
+                                    },
+                                },
+                                "& .MuiInputLabel-root": {
+                                    color: "white", // cor do label mesmo sem foco
+                                },
+                            }}
+
                         />
                         <Button variant="contained">Enviar</Button>
                     </div>
