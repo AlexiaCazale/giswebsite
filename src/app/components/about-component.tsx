@@ -14,7 +14,7 @@ export default function About() {
 
     return (
         <React.Fragment>
-            <div className="flex justify-between bg-[#f7e9e4] h-screen w-screen gap-6 px-16">
+            <div className="md:flex flex-col justify-between bg-[#f7e9e4] sm:w-[100%] lg:h-screen lg:w-screen gap-6 p-[30px] md:px-16 lg:px-32">
                 <div className="flex flex-col w-[100%] justify-center gap-4">
 
                     {/* "Um estudo para estimular e desenvolver competências em STEM (Ciência, Tecnologia, Engenharia e Matemática) nas diversas etapas do ensino!" */}
@@ -25,8 +25,8 @@ export default function About() {
                     showCursor={true}
                     cursorCharacter="|"
                 /> */}
-                    <h1>Sobre nós</h1>
-                    <div className="flex gap-2 items-center">
+                    <h1 className="text-center md:text-start">Sobre nós</h1>
+                    <div className="flex gap-2 items-center text-center justify-center md:justify-start">
                         <p>Girls In</p>
                         <RotatingText
                             //  bg-gradient-to-r from-[#BF4E83] to-[#000A90]
@@ -37,12 +37,12 @@ export default function About() {
                             animate={{ y: 0 }}
                             exit={{ y: "-120%" }}
                             staggerDuration={0.025}
-                            splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
+                            splitLevelClassName="overflow-hidden sm:pb-1"
                             transition={{ type: "spring", damping: 30, stiffness: 400 }}
                             rotationInterval={2000}
                         />
                     </div>
-                    <div>
+                    <div className="text-center md:text-start">
                         <p>O Girls in STEM, coordenado pela professora Cida Zem, é um projeto que incentiva a participação feminina em Ciência, Tecnologia, Engenharia e Matemática (STEM). STEM é uma abordagem educacional que integra ciência, tecnologia, engenharia e matemática, preparando profissionais para o futuro, desenvolvendo pensamento crítico, raciocínio lógico e criatividade.</p>
                         <br />
 
@@ -55,8 +55,9 @@ export default function About() {
                         <br />
                     </div>
 
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 flex-col md:flex-row">
                         {data.map((e, index) => (
+
                             <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(255, 0, 93, 0.3)" key={index}>
                                 <p>{e}</p>
                             </SpotlightCard>
@@ -64,8 +65,7 @@ export default function About() {
                     </div>
                 </div>
                 {/* <div className="flex justify-end [h-100vh]"> */}
-                <div className="relative h-screen w-1/2">
-
+                <div className="hidden md:flex relative h-screen w-1/2">
                     <Image
                         src={"/heart-8564951.svg"}
                         alt="flower"

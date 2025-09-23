@@ -19,7 +19,7 @@ export default function Member() {
         },
         {
             id: 2,
-            name: "Júlia Mazoti",
+            name: "Julia Mazoti",
             description: "Estudante",
             imgUrl: "/members/julia.jpeg",
         },
@@ -69,8 +69,8 @@ export default function Member() {
 
     return (
         <React.Fragment>
-            <div className="flex bg-[#f2e4db] h-screen w-screen px-16">
-                <div className="relative h-screen w-1/2">
+            <div className="flex bg-[#f2e4db] w-[100%] h=[100%] md:h-screen md:w-screen p-[30px] md:px-16 lg:px-32">
+                <div className="hidden md:flex relative h-screen w-1/2">
                     <Image
                         src={"/floral-9190055.svg"}
                         alt="flower"
@@ -79,7 +79,7 @@ export default function Member() {
                         priority />
                 </div>
                 <div className="flex flex-col w-[100%] justify-center gap-6">
-                    <h1>Membros</h1>
+                    <h1 className="text-center md:text-start">Membros</h1>
                     <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
                         {membersList.map((member) => (
                             <div key={member.id} className="flex flex-col gap-2 items-center justify-center">
