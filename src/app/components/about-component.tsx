@@ -57,7 +57,6 @@ export default function About() {
 
                     <div className="flex gap-4 flex-col md:flex-row">
                         {data.map((e, index) => (
-
                             <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(255, 0, 93, 0.3)" key={index}>
                                 <p>{e}</p>
                             </SpotlightCard>
