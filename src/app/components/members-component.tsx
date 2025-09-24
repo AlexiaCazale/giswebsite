@@ -69,7 +69,7 @@ export default function Member() {
 
     return (
         <React.Fragment>
-            <div className="flex bg-[#f2e4db] w-[100%] h=[100%] md:h-screen md:w-screen p-[30px] md:px-16 lg:px-32">
+            <div className="flex bg-[#f2e4db] w-[100%] h-[100%] xl:w-screen p-[30px] md:px-16">
                 <div className="hidden md:flex relative h-screen w-1/2">
                     <Image
                         src={"/floral-9190055.svg"}

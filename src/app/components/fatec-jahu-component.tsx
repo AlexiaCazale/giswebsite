@@ -19,7 +19,7 @@ export default function FatecJahu() {
     ]
     return (
         <React.Fragment>
-            <div className="lg:flex flex-col h-[100%] lg-[h-100vh] bg-[#d1af65] md:h-screen md:w-[100%] p-[30px] md:px-16 lg:px-32">
+            <div className="lg:flex md:flex-row flex-col h-[100%] lg-[h-100vh] bg-[#d1af65] xl:h-screen md:w-[100%] p-[30px] md:px-16">
                 <div className="hidden md:flex relative h-screen w-1/2">
                     <Image
                         src={"/flowers-9190054.svg"}
@@ -36,7 +36,7 @@ export default function FatecJahu() {
                             A FATEC Jahu é uma instituição pública de ensino superior em Jaú, São Paulo, que oferece cursos de graduação tecnológica. Parte do Sistema FATEC vinculado ao Centro Paula Souza, a faculdade integra teoria e prática, com laboratórios modernos e atividades extracurriculares, como palestras e parcerias com empresas. Com um corpo docente qualificado, a FATEC Jahu prepara os alunos para o mercado de trabalho, oferecendo uma formação prática e de qualidade em setores tecnológicos e empresariais.
                         </p>
 
-                        <div className="grid w-[100%] gap-4 grid-cols-[repeat(auto-fit,minmax(350px,1fr))]">
+                        <div className="grid w-[100%] gap-4 grid-cols-[repeat(auto-fit,minmax(300px,1fr))]">
                             {data.map((e, i) => (
                                 <FadeContent blur={true} duration={1000} easing="ease-out" initialOpacity={0} key={i}>
                                     <div className="bg-[#fff3c6] p-5 rounded-[6px]">{e}</div>

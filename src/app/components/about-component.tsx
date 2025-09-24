@@ -14,7 +14,7 @@ export default function About() {
 
     return (
         <React.Fragment>
-            <div className="md:flex flex-col justify-between bg-[#f7e9e4] sm:w-[100%] lg:h-screen lg:w-screen gap-6 p-[30px] md:px-16 lg:px-32">
+            <div className="md:flex md:flex-row flex-col justify-between bg-[#f7e9e4] sm:w-[100%] xl:h-screen xl:w-screen gap-6 p-[30px] md:px-16">
                 <div className="flex flex-col w-[100%] justify-center gap-4">
 
                     {/* "Um estudo para estimular e desenvolver competências em STEM (Ciência, Tecnologia, Engenharia e Matemática) nas diversas etapas do ensino!" */}
