@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import styles from "./page.module.css";
 import Welcome from "./components/welcome-component";
@@ -9,20 +11,23 @@ import Member from "./components/members-component";
 import Contact from "./components/contact-component";
 import FooterComponent from "./components/footer-component";
 import HeaderComponent from "./components/header-component";
+import { ParallaxProvider } from "react-scroll-parallax";
 
 export default function Home() {
   return (
-    <div className="bg-[#1a1a1a]">
-      <HeaderComponent/>
-      <Welcome/>
-      <About/>
-      <FatecJahu/>
-      <SearchResult/>
-      <Projects/> 
-      {/* Notícios */}
-      <Member/>
-      <Contact/>
-      <FooterComponent/>
-    </div>
+    <ParallaxProvider>
+      <div className="bg-[#1a1a1a]">
+        <HeaderComponent />
+        <Welcome />
+        <About />
+        <FatecJahu />
+        <SearchResult />
+        <Projects />
+        {/* Notícios */}
+        <Member />
+        <Contact />
+        <FooterComponent />
+      </div>
+    </ParallaxProvider>
   );
 }

@@ -3,8 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-export default function Projects() {
-  const data = [
+export const dataProjects = [
     {
       id: 0,
       name: "Inteligência Artificial",
@@ -30,6 +29,9 @@ export default function Projects() {
       alt: "Projeto 2",
     },
   ];
+
+export default function Projects() {
+  
   return (
     <React.Fragment>
       <div className="flex bg-[#2f3e43] justify-between h-[100%] w-[100%] lg:h-screen lg:w-screen p-[30px] md:px-16">
@@ -41,7 +43,7 @@ export default function Projects() {
         
           gap-6 justify-items-center"
           >
-            {data.map((e) => (
+            {dataProjects.map((e) => (
               <Link href={`/projeto/${e.id}`} key={e.id}>
                 <PixelCard variant="blue">
                   <Image
