@@ -25,13 +25,10 @@ export default function Projeto() {
     <div >
       {/* className="bg-[#1a1a1a] " */}
       <HeaderComponent />
-      <div className="h-[90vh] 2xl: h-[95vh] bg-[#1a1a1a]">
-
-
-
+      {/* <div className="min-h-[90vh] 2xl: h-[95vh] bg-[#1a1a1a]"> */}
 
         <ProjectDetails project={project} />
-      </div>
+      {/* </div> */}
       {/* <Masonry
         items={items}
         ease="power3.out"

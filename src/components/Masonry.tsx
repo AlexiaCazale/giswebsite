@@ -132,30 +132,32 @@ const Masonry: React.FC<MasonryProps> = ({
     preloadImages(items.map(i => i.img)).then(() => setImagesReady(true)); 
   }, [items]); 
   
-  const grid = useMemo<GridItem[]>(() => { 
-    if (!width) return []; 
+  // 🔥 Agora grid retorna também a altura total
+  const grid = useMemo<{ items: GridItem[]; totalHeight: number }>(() => { 
+    if (!width) return { items: [], totalHeight: 0 }; 
     const colHeights = new Array(columns).fill(0); 
     const gap = 16; 
     const totalGaps = (columns - 1) * gap; 
     const columnWidth = (width - totalGaps) / columns; 
     
-    return items.map(child => { 
+    const mapped = items.map(child => { 
       const col = colHeights.indexOf(Math.min(...colHeights)); 
       const x = col * (columnWidth + gap); 
-      // Corrigido: usar a altura fornecida diretamente
       const height = child.height; 
       const y = colHeights[col]; 
       colHeights[col] += height + gap; 
       return { ...child, x, y, w: columnWidth, h: height }; 
     }); 
+    
+    return { items: mapped, totalHeight: Math.max(...colHeights) }; 
   }, [columns, items, width]); 
   
   const hasMounted = useRef(false); 
   
   useLayoutEffect(() => { 
-    if (!imagesReady || !grid.length) return; 
+    if (!imagesReady || !grid.items.length) return; 
     
-    grid.forEach((item, index) => { 
+    grid.items.forEach((item, index) => { 
       const selector = `[data-key="${item.id}"]`; 
       const animProps = { 
         x: item.x, 
@@ -224,15 +226,19 @@ const Masonry: React.FC<MasonryProps> = ({
   }; 
   
   return ( 
-    <div ref={containerRef} className="relative w-full h-full min-h-[500px]">
-      {grid.map(item => ( 
+    <div 
+      ref={containerRef} 
+      className="relative w-full min-h-[500px]" 
+      style={{ height: grid.totalHeight }} // 🔥 garante altura da grid
+    >
+      {grid.items.map(item => ( 
         <div 
           key={item.id} 
           data-key={item.id} 
           className="absolute box-content cursor-pointer overflow-hidden"
           style={{ 
             willChange: 'transform, width, height, opacity',
-            transform: 'translate3d(0, 0, 0)' // Força aceleração GPU
+            transform: 'translate3d(0, 0, 0)' 
           }} 
           onClick={() => window.open(item.url, '_blank', 'noopener')} 
           onMouseEnter={e => handleMouseEnter(item.id, e.currentTarget)} 
