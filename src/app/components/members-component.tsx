@@ -7,21 +7,21 @@ import SlideComponent from "./slide-component";
 export const membersList = [
   {
     id: 0,
-    name: "Letícia Garcia",
-    description: "Estudante",
-    imgUrl: "/members/leticia.jpeg",
-  },
-  {
-    id: 1,
     name: "Aléxia Cazale",
     description: "Estudante",
     imgUrl: "/members/alexia.jpeg",
   },
   {
-    id: 2,
+    id: 1,
     name: "Julia Mazoti",
     description: "Estudante",
     imgUrl: "/members/julia.jpeg",
+  },
+  {
+    id: 2,
+    name: "Letícia Garcia",
+    description: "Estudante",
+    imgUrl: "/members/leticia.jpeg",
   },
   {
     id: 3,

@@ -2,6 +2,7 @@ import Masonry from "@/components/Masonry";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import SlideComponentProjects from "./slide-component-projects";
 
 export interface Project {
   id: number;
@@ -10,6 +11,7 @@ export interface Project {
   src: string;
   alt: string;
   height?: number;
+  gallery?: { id: string; img: string; height: number }[];
 }
 
 interface ProjectDetailsProps {
@@ -21,42 +23,15 @@ function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
   console.info("You clicked a breadcrumb.");
 }
 
-// Corrigir as URLs das imagens - usar URLs que realmente existam
-export const items = [
-  {
-    id: "1",
-    img: "/projects/IA/20241011_140610.jpg", // URL mais simples
-    url: "/projects/IA/20241011_140610.jpg",
-    height: 400,
-  },
-  {
-    id: "2",
-    img: "/projects/IA/20241011_140610.jpg",
-    url: "/projects/IA/20241011_140610.jpg",
-    height: 300,
-  },
-  {
-    id: "3",
-    img: "/projects/IA/20241011_140610.jpg",
-    url: "/projects/IA/20241011_140610.jpg",
-    height: 500,
-  },
-  {
-    id: "4",
-    img: "/projects/IA/20241011_140610.jpg",
-    url: "/projects/IA/20241011_140610.jpg",
-    height: 350,
-  },
-  {
-    id: "5",
-    img: "/projects/IA/20241011_140610.jpg",
-    url: "/projects/IA/20241011_140610.jpg",
-    height: 450,
-  },
-];
+export default function ProjectDetails({ project }: ProjectDetailsProps) {
 
-export default function ProjectDetails(props: ProjectDetailsProps) {
-  const { project } = props;
+  const items =
+    project.gallery?.map((g) => ({
+      id: g.id,
+      img: g.img,
+      url: g.img,
+      height: g.height,
+    })) ?? [];
 
   return (
     <div className="flex flex-col gap-4 w-full min-h-screen p-[30px] md:px-16 bg-[#1a1a1a] text-white items-center justify-center">
@@ -95,10 +70,12 @@ export default function ProjectDetails(props: ProjectDetailsProps) {
 
       <div className="w-full max-w-6xl">
         <div className="flex flex-col w-full justify-center items-center">
-          <h1 className="text-2xl font-bold text-center mb-4">
+          <h1 className="text-2xl font-bold text-center">
             Veja outros projetos
           </h1>
-
+          <div className="w-[100%] py-10">
+            <SlideComponentProjects />
+          </div>
           <div className="flex justify-center mb-4">
             <button className="px-6 py-2 border border-white rounded-lg hover:bg-white hover:text-black transition-colors">
               <Link href="/#projects">Voltar para projetos</Link>

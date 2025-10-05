@@ -23,23 +23,8 @@ export default function Projeto() {
 
   return (
     <div >
-      {/* className="bg-[#1a1a1a] " */}
       <HeaderComponent />
-      {/* <div className="min-h-[90vh] 2xl: h-[95vh] bg-[#1a1a1a]"> */}
-
         <ProjectDetails project={project} />
-      {/* </div> */}
-      {/* <Masonry
-        items={items}
-        ease="power3.out"
-        duration={0.6}
-        stagger={0.05}
-        animateFrom="bottom"
-        scaleOnHover={true}
-        hoverScale={0.95}
-        blurToFocus={true}
-        colorShiftOnHover={false}
-      /> */}
       <FooterComponent />
     </div>
   );

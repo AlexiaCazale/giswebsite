@@ -19,7 +19,7 @@ export default function FatecJahu() {
     return (
         <React.Fragment>
             <div className="lg:flex md:flex-row flex-col h-[100%] lg-[h-100vh] bg-[#d1af65] xl:h-screen md:w-[100%] p-[30px] md:px-16">
-                <div className="hidden md:flex relative h-screen w-1/2">
+                <div className="hidden md:flex relative h-screen md:w-[100%] lg:w-1/2">
                     <Image
                         src={"/flowers-9190054.svg"}
                         alt="flower"

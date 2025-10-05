@@ -14,22 +14,14 @@ export default function About() {
 
     return (
         <React.Fragment>
-            <div className="md:flex md:flex-row flex-col justify-between bg-[#f7e9e4] sm:w-[100%] xl:h-screen xl:w-screen gap-6 p-[30px] md:px-16">
+            <div className="md:flex lg:flex-row flex-col justify-between bg-[#f7e9e4] sm:w-[100%] xl:h-screen xl:w-screen gap-6 p-[30px] md:px-16">
+
                 <div className="flex flex-col w-[100%] justify-center gap-4">
 
-                    {/* "Um estudo para estimular e desenvolver competências em STEM (Ciência, Tecnologia, Engenharia e Matemática) nas diversas etapas do ensino!" */}
-                    {/* <TextType
-                    text={["STEM"]}
-                    typingSpeed={175}
-                    pauseDuration={1500}
-                    showCursor={true}
-                    cursorCharacter="|"
-                /> */}
                     <h1 className="text-center md:text-start">Sobre nós</h1>
                     <div className="flex gap-2 items-center text-center justify-center md:justify-start">
                         <p>Girls In</p>
                         <RotatingText
-                            //  bg-gradient-to-r from-[#BF4E83] to-[#000A90]
                             texts={['Science', 'Technology', 'Engineering', 'Mathematic']}
                             mainClassName="px-2 sm:px-2 md:px-3 bg-[#d99ab9] text-black overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
                             staggerFrom={"last"}
@@ -63,8 +55,8 @@ export default function About() {
                         ))}
                     </div>
                 </div>
-                {/* <div className="flex justify-end [h-100vh]"> */}
-                <div className="hidden md:flex relative h-screen w-1/2">
+
+                <div className="hidden md:flex relative h-screen md:w-[100%] lg:w-1/2">
                     <Image
                         src={"/heart-8564951.svg"}
                         alt="flower"
@@ -72,7 +64,7 @@ export default function About() {
                         className="h-[100%]"
                         priority />
                 </div>
-                {/* </div> */}
+
             </div>
         </React.Fragment>
     )
