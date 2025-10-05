@@ -23,7 +23,7 @@ export default function Home() {
         <Welcome />
         <About />
         <FatecJahu />
-        <SearchResult />
+        {/* <SearchResult /> */}
         <Projects />
         {/* Notícios */}
         <Member />

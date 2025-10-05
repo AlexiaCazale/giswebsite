@@ -81,9 +81,12 @@ export default function Contact() {
             />
             <Button
               variant="contained"
-              sx={{
-                "& .MuiButtonBase-root": {
+               sx={{
+                color: "#000",
+                fontWeight: 600, // Adiciona o peso da fonte
+                "&:hover": {
                   color: "#000",
+                  fontWeight: 600, // Mantém o mesmo peso no hover
                 },
               }}
             >

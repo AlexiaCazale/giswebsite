@@ -63,14 +63,14 @@ export default function Projects() {
   return (
     <React.Fragment>
       <div className="flex bg-[#2f3e43] justify-between h-[100%] w-[100%] lg:h-screen lg:w-screen p-[30px] md:px-16">
-        <div className="flex flex-col w-2/3 justify-center gap-6   text-[#f4f0e5]">
+        <div className="flex flex-col w-[100%] lg:w-2/3 justify-center gap-6   text-[#f4f0e5]">
           <div>
             <h1 className=" text-center md:text-start">Projetos</h1>
-            <p>Fique por dentro dos nossos projetos.</p>
+            <p className="text-center md:text-start">Fique por dentro dos nossos projetos.</p>
           </div>
           <SlideComponentProjects />
         </div>
-        <div className="hidden md:flex relative h-screen w-1/3">
+        <div className="hidden md:flex relative h-screen lg:w-1/3">
           <Image
             src="/floral-9190052.svg"
             alt="flower"

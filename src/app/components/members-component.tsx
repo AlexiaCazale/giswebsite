@@ -71,7 +71,7 @@ export default function Member() {
   return (
     <React.Fragment>
       <div className="flex bg-[#f2e4db] w-[100%] h-[100%] xl:w-screen p-[30px] md:px-16">
-        <div className="hidden md:flex relative h-screen w-1/3">
+        <div className="hidden md:flex relative h-screen lg:w-1/3">
           <Image
             src={"/floral-9190055.svg"}
             alt="flower"
@@ -80,29 +80,37 @@ export default function Member() {
             priority
           />
         </div>
-        <div className="flex flex-col w-2/3 justify-center gap-6">
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col w-[100%] xl:w-2/3 justify-center gap-6">
+          <div className="flex flex-col">
             <h1 className="text-center md:text-start">Membros</h1>
-            <p className="mb-3">
+            <p className="mb-3 text-center md:text-start">
               Conheça o rosto de cada um que contribuiu com esse projeto.
             </p>
           </div>
 
           <div className="flex flex-col gap-10">
-            <div className="flex items-center gap-10">
-              <div className="bg-[#a45944] rounded-full p-1">
+            <div className="flex flex-col xl:flex-row items-center gap-4 md:gap-10">
+              <div className="bg-[#a45944] rounded-full p-1 w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] md:w-[280px] md:h-[280px]">
                 <Image
                   src={"/members/cida.jpeg"}
                   alt={"Profª Cida Zem"}
-                  width={150}
-                  height={150}
-                  className="rounded-[50%] w-[250px] h-[250px] object-cover  border-l-8 border-[#a45944]"
+                  width={280}
+                  height={280}
+                  className="rounded-[50%] w-full h-full object-cover"
+                  priority
                 />
               </div>
-              <div className="flex-col">
 
-              <p className="mt-2 font-bold">Profª Dra. Aparecia Zem Lopes</p>
-              <span className="text-sm">Nossa orientadora</span>
+              <div className="flex-col text-center xl:text-start max-w-lg">
+                <p className="mt-2 font-bold text-lg md:text-xl">Profª Dra. Aparecia Zem Lopes</p>
+                <span className="text-sm font-medium block mt-1">
+                  Nossa Guia e Inspiração
+                </span>
+                <p className="mt-2 text-sm leading-relaxed">
+                  Com sabedoria e dedicação, a Profª Cida não apenas orienta este projeto,
+                  mas inspira cada um de nós a alcançar novos horizontes. Sua experiência
+                  e paixão pelo ensino são o alicerce que sustenta nossa jornada científica.
+                </p>
               </div>
             </div>
             <SlideComponent slides={membersList} />

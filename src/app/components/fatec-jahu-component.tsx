@@ -1,4 +1,3 @@
-import FadeContent from "@/components/FadeContent";
 import SpotlightCard from "@/components/SpotlightCard";
 import StarBorder from "@/components/StarBorder";
 import Image from "next/image";
@@ -38,9 +37,9 @@ export default function FatecJahu() {
 
                         <div className="grid w-[100%] gap-4 grid-cols-[repeat(auto-fit,minmax(300px,1fr))]">
                             {data.map((e, i) => (
-                                <FadeContent blur={true} duration={1000} easing="ease-out" initialOpacity={0} key={i}>
-                                    <div className="bg-[#fff3c6] p-5 rounded-[6px]">{e}</div>
-                                </FadeContent>
+                                <div className="min-h-[60px] max-h-[90px]" key={i}>
+                                    <div className="bg-[#fff3c6] p-5 rounded-[1.5rem]">{e}</div>
+                                </div>
                             ))}
                         </div>
                     </div>
