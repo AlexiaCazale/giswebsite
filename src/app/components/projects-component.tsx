@@ -18,6 +18,7 @@ export const dataProjects = [
     description:
       "Projeto de apresentação realizado pela profª Cida Zem para os alunos da escola EMI Ana Franco, durante um bate-papo sobre inteligência artificial, tecnologia na educação, inclusão e a importância das mulheres na tecnologia.",
     imgUrl: "/projects/ia-capa.jpeg",
+    src: "/projects/ia-capa.jpeg",
     alt: "Projeto 1",
   },
   {
@@ -26,6 +27,7 @@ export const dataProjects = [
     description:
       "Projeto de Arduino desenvolvido pelos alunos do grupo de pesquisa Girls in STEM, apresentado durante o evento Fatec de Portas Abertas em 2024 e também para os estudantes da escola EMI Ana Franco, com a orientação dos professores Josiane e Felipe.",
     imgUrl: "/projects/girassolCapa.jpeg",
+    src: "/projects/girassolCapa.jpeg",
     alt: "Projeto 2",
   },
   {
@@ -34,6 +36,7 @@ export const dataProjects = [
     description:
       "Projeto de Arduino desenvolvido pelos alunos do grupo de pesquisa Girls in STEM, apresentado durante o evento Fatec de Portas Abertas em 2024 e também para os estudantes da escola EMI Ana Franco, com a orientação dos professores Josiane e Felipe.",
     imgUrl: "/projects/girassolCapa.jpeg",
+    src: "/projects/girassolCapa.jpeg",
     alt: "Projeto 2",
   },
   {
@@ -42,6 +45,7 @@ export const dataProjects = [
     description:
       "Projeto de Arduino desenvolvido pelos alunos do grupo de pesquisa Girls in STEM, apresentado durante o evento Fatec de Portas Abertas em 2024 e também para os estudantes da escola EMI Ana Franco, com a orientação dos professores Josiane e Felipe.",
     imgUrl: "/projects/girassolCapa.jpeg",
+    src: "/projects/girassolCapa.jpeg",
     alt: "Projeto 2",
   },
   {
@@ -49,6 +53,7 @@ export const dataProjects = [
     name: "Girassol Arduino",
     description:
       "Projeto de Arduino desenvolvido pelos alunos do grupo de pesquisa Girls in STEM, apresentado durante o evento Fatec de Portas Abertas em 2024 e também para os estudantes da escola EMI Ana Franco, com a orientação dos professores Josiane e Felipe.",
+    src: "/projects/girassolCapa.jpeg",
     imgUrl: "/projects/girassolCapa.jpeg",
     alt: "Projeto 2",
   },
