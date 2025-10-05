@@ -1,6 +1,8 @@
 import Image from "next/image";
 import React from "react";
 import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export interface ISlide {
   id: number;
@@ -49,14 +51,12 @@ function SlideComponent({ slides = [] }: SlideComponentProps) {
       },
     ],
   };
+  
   return (
     <div className="slider-container">
       <Slider {...settings}>
         {slides.map((e) => (
-          <div
-            key={e.id}
-            className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]"
-          >
+          <div key={e.id} className="px-2"> {/* Adicione padding horizontal */}
             <div className="flex flex-col items-center text-center">
               <div className="bg-[#a45944] rounded-full p-1">
                 <Image
@@ -64,7 +64,7 @@ function SlideComponent({ slides = [] }: SlideComponentProps) {
                   alt={e.name}
                   width={150}
                   height={150}
-                  className="rounded-[50%] w-[150px] h-[150px] object-cover  border-l-8 border-[#a45944]"
+                  className="rounded-[50%] w-[150px] h-[150px] object-cover"
                 />
               </div>
               <p className="mt-2 font-bold">{e.name}</p>

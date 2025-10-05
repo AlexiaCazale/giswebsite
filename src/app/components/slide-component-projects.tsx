@@ -47,10 +47,7 @@ function SlideComponentProjects() {
     <div className="slider-container">
       <Slider {...settings}>
         {dataProjects.map((e) => (
-          <div
-            key={e.id}
-            className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(200px,1fr))]"
-          >
+          <div key={e.id} className="px-2">
             <Link href={`/projeto/${e.id}`} key={e.id}>
               <div className="flex flex-col items-center p-1">
                 <Image
