@@ -1,8 +1,12 @@
+"use client";
+
 import Image from "next/image";
-import React from "react";
-import Slider from "react-slick";
+import React, { useEffect, useState } from "react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import dynamic from "next/dynamic";
+
+const Slider = dynamic(() => import("react-slick"), { ssr: false });
 
 export interface ISlide {
   id: number;
@@ -17,46 +21,37 @@ interface SlideComponentProps {
 }
 
 function SlideComponent({ slides = [] }: SlideComponentProps) {
-  var settings = {
+  const [mounted, setMounted] = useState(false);
+  const [windowWidth, setWindowWidth] = useState<number>(0);
+
+  useEffect(() => {
+    // Detecta o tamanho da tela apenas no cliente
+    setWindowWidth(window.innerWidth);
+    setMounted(true);
+
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  if (!mounted) return null;
+
+  // Configurações do carrossel
+  const settings = {
     dots: true,
     infinite: false,
     speed: 500,
-    slidesToShow: 5,
-    slidesToScroll: 5,
-    initialSlide: 0,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 3,
-          infinite: true,
-          dots: true,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 2,
-          initialSlide: 2,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
+    slidesToShow:
+      windowWidth >= 1024 ? 5 : windowWidth >= 600 ? 3 : windowWidth >= 480 ? 2 : 1,
+    slidesToScroll:
+      windowWidth >= 1024 ? 5 : windowWidth >= 600 ? 3 : windowWidth >= 480 ? 2 : 1,
   };
-  
+
   return (
     <div className="slider-container">
       <Slider {...settings}>
         {slides.map((e) => (
-          <div key={e.id} className="px-2"> {/* Adicione padding horizontal */}
+          <div key={e.id} className="px-2">
             <div className="flex flex-col items-center text-center">
               <div className="bg-[#a45944] rounded-full p-1">
                 <Image
