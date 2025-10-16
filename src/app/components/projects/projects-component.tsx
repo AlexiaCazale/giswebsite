@@ -2,14 +2,8 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import Responsive from "./slide-component";
-import SimpleSlider from "./slide-component";
-import SlideComponent from "./slide-component";
 import SlideComponentProjects from "./slide-component-projects";
 
-const PixelCard = dynamic(() => import("@/components/PixelCard"), {
-  ssr: false,
-});
 
 export const dataProjects = [
   {

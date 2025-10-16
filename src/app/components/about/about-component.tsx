@@ -1,6 +1,5 @@
 import RotatingText from "@/components/RotatingText";
 import SpotlightCard from "@/components/SpotlightCard";
-import TextType from "@/components/TextType";
 import Image from "next/image";
 import React from "react";
 
