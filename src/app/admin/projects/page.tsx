@@ -28,6 +28,8 @@ import {
   LinearProgress,
   SelectChangeEvent,
   ChipProps,
+  SxProps,
+  Theme,
 } from "@mui/material";
 import {
   AddCircleOutline as PlusCircleIcon,
@@ -99,26 +101,53 @@ const ProjectsPage = () => {
     }));
   };
 
-  type StatusChipProps = Pick<ChipProps, 'label' | 'size' | 'onClick'> & {
-    sx: {
-      bgcolor: string;
-      color: string;
-    };
+  type StatusChipProps = {
+    label: string;
+    size: 'small';
+    sx: SxProps<Theme>;
   };
 
-  const getStatusChipProps = (status: Project["status"]) => {
+  const getStatusChipProps = (status: string): StatusChipProps => {
     switch (status) {
-      case "Em Andamento":
-        return { label: status, sx: { bgcolor: 'hsl(var(--vibrant-blue) / 0.2)', color: 'hsl(var(--vibrant-blue))' } };
-      case "Concluído":
-        return { label: status, sx: { bgcolor: 'hsl(var(--vibrant-green) / 0.2)', color: 'hsl(var(--vibrant-green))' } };
-      case "Pendente":
-        return { label: status, sx: { bgcolor: 'hsl(var(--vibrant-orange) / 0.2)', color: 'hsl(var(--vibrant-orange))' } };
+      case 'Concluído':
+        return {
+          size: 'small', // Include size here for a cleaner call
+          label: 'Concluído',
+          sx: {
+            bgcolor: 'hsl(142.1 76.2% 36.3%)', // Example: Green background
+            color: 'hsl(142.1 70.2% 80.3%)',   // Example: Light text
+          },
+        };
+      case 'Em Andamento':
+        return {
+          size: 'small',
+          label: 'Em Andamento',
+          sx: {
+            bgcolor: 'hsl(47.9 95.8% 53.1%)', // Example: Yellow background
+            color: 'hsl(47.9 95.8% 30.1%)',
+          },
+        };
+      case 'Pendente':
+        return {
+          size: 'small',
+          label: 'Pendente',
+          sx: {
+            bgcolor: 'hsl(210 40% 96.1%)', // Example: Light Gray
+            color: 'hsl(210 40% 40.1%)',
+          },
+        };
       default:
-        return { label: status, color: "default" };
+        return {
+          size: 'small',
+          label: 'Desconhecido',
+          sx: {
+            bgcolor: 'hsl(0 0% 80%)',
+            color: 'hsl(0 0% 20%)',
+          },
+        };
     }
   };
-  
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
