@@ -31,7 +31,6 @@ import {
 import { Member, mockMembers } from "@/app/lib/data";
 import { showSuccess } from "@/utils/toast";
 
-
 const MembersPage = () => {
   const [members, setMembers] = useState<Member[]>(mockMembers);
   const [isDialogOpen, setIsDialogOpen] = useState(false);

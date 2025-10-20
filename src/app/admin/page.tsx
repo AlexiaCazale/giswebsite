@@ -1,228 +1,115 @@
 "use client";
 
-import React from "react";
-import { Card, CardContent, CardHeader, Typography } from "@mui/material";
-import Button from "@mui/material/Button";
-import LinearProgress from "@mui/material/LinearProgress";
-import Avatar from "@mui/material/Avatar";
-import Chip from "@mui/material/Chip";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
-  Group as UsersIcon,
-  Folder as FolderKanbanIcon,
-  BarChart as BarChart2Icon,
-  CheckCircleOutline as CheckCircleIcon,
-  Newspaper as NewspaperIcon,
-  ArrowOutward as ArrowUpRightIcon,
-} from "@mui/icons-material";
-import Link from "next/link";
+  Button,
+  TextField,
+  Typography,
+  Box,
+  Paper, // Usar Paper para o painel de login
+}
+  from "@mui/material";
+import { showSuccess, showError } from "@/utils/toast";
+import { useRouter } from "next/navigation";
 
-const DashboardPage = () => {
+const LoginPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simulação de login: Em um aplicativo real, você faria uma chamada de API aqui.
+
+    // email: girlsinstemfatec@gmail.com
+    // password:  GirlsInStem!F@tec24
+    if (email === "teste@teste.com" && password === "123") {
+      showSuccess("Login realizado com sucesso!");
+      router.push("/admin/dashboard"); // Redireciona para o painel administrativo
+    } else {
+      showError("Credenciais inválidas. Tente novamente.");
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center">
-        <Typography variant="h4" component="h1" fontWeight="bold">
-          Dashboard
+    <div className="min-h-screen flex items-center justify-center bg-login-bg-page p-4">
+      <Paper
+        elevation={3} // Adiciona uma sombra sutil
+        sx={{
+          width: '100%',
+          maxWidth: 400,
+          borderRadius: '1rem', // Bordas arredondadas
+          p: 4, // Padding interno
+          bgcolor: 'background.paper', // Fundo branco para o painel
+          color: 'text.primary', // Cor do texto padrão
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold" sx={{ mb: 4 }}>
+          Girls In STEM
         </Typography>
-      </div>
-      <Typography variant="body1" color="textSecondary" className="-mt-4">
-        Bem-vindo ao painel administrativo do Girls in STEM
-      </Typography>
 
-      {/* Statistics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-          <CardHeader
-            title={
-              <Typography variant="subtitle2" fontWeight="medium">
-                Total de Membros
-              </Typography>
-            }
-            action={<UsersIcon sx={{ color: 'hsl(var(--vibrant-blue))' }} />}
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}
-          />
-          <CardContent>
-            <Typography variant="h5" fontWeight="bold">
-              24
-            </Typography>
-            <Typography variant="caption" color="textSecondary">
-              +20.1% desde o mês passado
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-          <CardHeader
-            title={
-              <Typography variant="subtitle2" fontWeight="medium">
-                Total de Projetos
-              </Typography>
-            }
-            action={<FolderKanbanIcon sx={{ color: 'hsl(var(--vibrant-orange))' }} />}
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}
-          />
-          <CardContent>
-            <Typography variant="h5" fontWeight="bold">
-              12
-            </Typography>
-            <Typography variant="caption" color="textSecondary">
-              +18.5% desde o mês passado
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-          <CardHeader
-            title={
-              <Typography variant="subtitle2" fontWeight="medium">
-                Projetos Ativos
-              </Typography>
-            }
-            action={<BarChart2Icon sx={{ color: 'hsl(var(--vibrant-purple))' }} />}
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}
-          />
-          <CardContent>
-            <Typography variant="h5" fontWeight="bold">
-              8
-            </Typography>
-            <Typography variant="caption" color="textSecondary">
-              +5.2% desde o mês passado
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-          <CardHeader
-            title={
-              <Typography variant="subtitle2" fontWeight="medium">
-                Projetos Concluídos
-              </Typography>
-            }
-            action={<CheckCircleIcon sx={{ color: 'hsl(var(--vibrant-green))' }} />}
-            sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}
-          />
-          <CardContent>
-            <Typography variant="h5" fontWeight="bold">
-              4
-            </Typography>
-            <Typography variant="caption" color="textSecondary">
-              +10.0% desde o mês passado
-            </Typography>
-          </CardContent>
-        </Card>
-      </div>
+        <Typography variant="h6" sx={{ mb: 3 }}>
+          Login your account
+        </Typography>
 
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-        {/* Quick Actions */}
-        <Card className="xl:col-span-1" sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-          <CardHeader title={<Typography variant="h6">Ações Rápidas</Typography>} />
-          <CardContent className="grid gap-4">
-            <Link href="/admin/members" className="flex items-center gap-4 p-3 rounded-md hover:bg-muted/50 transition-colors">
-              <UsersIcon sx={{ color: 'hsl(var(--vibrant-blue))' }} />
-              <div>
-                <Typography variant="subtitle1" fontWeight="medium">Gerenciar Membros</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Ver todos os membros
-                </Typography>
-              </div>
-              <ArrowUpRightIcon className="ml-auto" sx={{ color: 'text.secondary' }} />
-            </Link>
-            <Link href="/admin/projects" className="flex items-center gap-4 p-3 rounded-md hover:bg-muted/50 transition-colors">
-              <FolderKanbanIcon sx={{ color: 'hsl(var(--vibrant-orange))' }} />
-              <div>
-                <Typography variant="subtitle1" fontWeight="medium">Gerenciar Projetos</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Ver todos os projetos
-                </Typography>
-              </div>
-              <ArrowUpRightIcon className="ml-auto" sx={{ color: 'text.secondary' }} />
-            </Link>
-            <Link href="/admin/news" className="flex items-center gap-4 p-3 rounded-md hover:bg-muted/50 transition-colors">
-              <NewspaperIcon sx={{ color: 'hsl(var(--vibrant-green))' }} />
-              <div>
-                <Typography variant="subtitle1" fontWeight="medium">Gerenciar Notícias</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Ver todas as notícias
-                </Typography>
-              </div>
-              <ArrowUpRightIcon className="ml-auto" sx={{ color: 'text.secondary' }} />
-            </Link>
-          </CardContent>
-        </Card>
-
-        {/* Recent Members */}
-        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-          <CardHeader
-            title={<Typography variant="h6">Membros Recentes</Typography>}
-            action={
-              <Button component={Link} href="/admin/members" size="small" sx={{ color: 'hsl(var(--admin-active-bg))' }}>
-                Ver todos
-              </Button>
-            }
+        <Box component="form" onSubmit={handleLogin} sx={{ mt: 2, width: '100%' }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Username"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            variant="standard"
+            sx={{ mb: 2 }}
           />
-          <CardContent className="grid gap-6">
-            <div className="flex items-center gap-4">
-              <Avatar sx={{ width: 36, height: 36 }}>AS</Avatar>
-              <div className="grid gap-1">
-                <Typography variant="subtitle2" fontWeight="medium" lineHeight="normal">Ana Silva</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Desenvolvedora
-                </Typography>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Avatar sx={{ width: 36, height: 36 }}>MS</Avatar>
-              <div className="grid gap-1">
-                <Typography variant="subtitle2" fontWeight="medium" lineHeight="normal">Maria Santos</Typography>
-                <Typography variant="body2" color="textSecondary">Designer</Typography>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Avatar sx={{ width: 36, height: 36 }}>JC</Avatar>
-              <div className="grid gap-1">
-                <Typography variant="subtitle2" fontWeight="medium" lineHeight="normal">Julia Costa</Typography>
-                <Typography variant="body2" color="textSecondary">Engenheira</Typography>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Projects */}
-        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-          <CardHeader
-            title={<Typography variant="h6">Projetos Recentes</Typography>}
-            action={
-              <Button component={Link} href="/admin/projects" size="small" sx={{ color: 'hsl(var(--admin-active-bg))' }}>
-                Ver todos
-              </Button>
-            }
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            variant="standard"
+            sx={{ mb: 1 }}
           />
-          <CardContent className="grid gap-6">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <Typography variant="subtitle1" fontWeight="medium">App de Educação STEM</Typography>
-                <Chip label="Em andamento" size="small" sx={{ bgcolor: 'hsl(var(--vibrant-blue) / 0.2)', color: 'hsl(var(--vibrant-blue))' }} />
-              </div>
-              <LinearProgress variant="determinate" value={75} sx={{ height: 8, borderRadius: 4, '& .MuiLinearProgress-bar': { bgcolor: 'hsl(var(--vibrant-blue))' } }} />
-              <Typography variant="body2" color="textSecondary">75% completo</Typography>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <Typography variant="subtitle1" fontWeight="medium">Workshop de Programação</Typography>
-                <Chip label="Em andamento" size="small" sx={{ bgcolor: 'hsl(var(--vibrant-orange) / 0.2)', color: 'hsl(var(--vibrant-orange))' }} />
-              </div>
-              <LinearProgress variant="determinate" value={45} sx={{ height: 8, borderRadius: 4, '& .MuiLinearProgress-bar': { bgcolor: 'hsl(var(--vibrant-orange))' } }} />
-              <Typography variant="body2" color="textSecondary">45% completo</Typography>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <Typography variant="subtitle1" fontWeight="medium">Hackathon 2024</Typography>
-                <Chip label="Concluído" size="small" sx={{ bgcolor: 'hsl(var(--vibrant-green) / 0.2)', color: 'hsl(var(--vibrant-green))' }} />
-              </div>
-              <LinearProgress variant="determinate" value={100} sx={{ height: 8, borderRadius: 4, '& .MuiLinearProgress-bar': { bgcolor: 'hsl(var(--vibrant-green))' } }} />
-              <Typography variant="body2" color="textSecondary">100% completo</Typography>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          {/* O link "forget password?" foi removido daqui */}
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{
+              py: 1.5,
+              fontSize: '1rem',
+              bgcolor: 'login-button-bg.DEFAULT',
+              color: 'login-button-bg.foreground',
+              '&:hover': {
+                bgcolor: 'login-button-bg.DEFAULT',
+                opacity: 0.9,
+              },
+              borderRadius: '0.5rem',
+              mt: 3, // Adiciona margem superior para compensar a remoção do link
+            }}
+          >
+            Login
+          </Button>
+        </Box>
+        {/* O botão "Create Account" foi removido daqui */}
+      </Paper>
     </div>
   );
 };
 
-export default DashboardPage;
+export default LoginPage;

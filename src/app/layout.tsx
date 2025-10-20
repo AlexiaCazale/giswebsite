@@ -38,7 +38,7 @@ export default function RootLayout({
 }>) {
 
   return (
-    <html lang="pt-br">
+    <html lang="pt-br" suppressHydrationWarning>
       <body>
         <ThemeProvider theme={theme}>
           {children}

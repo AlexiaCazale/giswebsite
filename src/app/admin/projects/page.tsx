@@ -106,43 +106,19 @@ const ProjectsPage = () => {
     };
   };
 
-  const getStatusChipProps = (status: string): StatusChipProps => {
+  const getStatusChipProps = (status: Project["status"]) => {
     switch (status) {
-      case 'Concluído':
-        return {
-          label: 'Concluído',
-          sx: {
-            bgcolor: 'hsl(142.1 76.2% 36.3%)', // Verde
-            color: 'hsl(142.1 70.2% 80.3%)', // Cor do texto
-          },
-        };
-      case 'Em Andamento':
-        return {
-          label: 'Em Andamento',
-          sx: {
-            bgcolor: 'hsl(47.9 95.8% 53.1%)', // Amarelo
-            color: 'hsl(47.9 95.8% 30.1%)',
-          },
-        };
-      case 'Pendente':
-        return {
-          label: 'Pendente',
-          sx: {
-            bgcolor: 'hsl(210 40% 96.1%)', // Cinza Claro
-            color: 'hsl(210 40% 40.1%)',
-          },
-        };
-      // Adicione mais casos conforme necessário
+      case "Em Andamento":
+        return { label: status, sx: { bgcolor: 'hsl(var(--vibrant-blue) / 0.2)', color: 'hsl(var(--vibrant-blue))' } };
+      case "Concluído":
+        return { label: status, sx: { bgcolor: 'hsl(var(--vibrant-green) / 0.2)', color: 'hsl(var(--vibrant-green))' } };
+      case "Pendente":
+        return { label: status, sx: { bgcolor: 'hsl(var(--vibrant-orange) / 0.2)', color: 'hsl(var(--vibrant-orange))' } };
       default:
-        return {
-          label: 'Desconhecido',
-          sx: {
-            bgcolor: 'hsl(0 0% 80%)',
-            color: 'hsl(0 0% 20%)',
-          },
-        };
+        return { label: status, color: "default" };
     }
   };
+  
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -160,6 +136,7 @@ const ProjectsPage = () => {
         >
           Adicionar Projeto
         </Button>
+
         <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
           <DialogTitle>{editingProject ? "Editar Projeto" : "Adicionar Novo Projeto"}</DialogTitle>
           <DialogContent>
