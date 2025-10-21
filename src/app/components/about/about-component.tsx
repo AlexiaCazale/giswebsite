@@ -6,15 +6,14 @@ import React from "react";
 export default function About() {
 
     let data = [
-        "35% dos diplomados em STEM são mulheres",
-        "33% ocupam cargos de pesquisa no mundo",
-        "áreas como engenharia, IA e dados, a participação cai para cerca de 22–31%",
+        "Apenas 30% das matrículas em cursos STEM no Brasil são femininas.",
+        "Somente 28% dos cargos de liderança no setor de tecnologia global são ocupados por mulheres.",
+        "Empresas de tecnologia com mais mulheres líderes têm 25% mais chances de serem mais rentáveis.",
     ]
 
     return (
         <React.Fragment>
-            <div className="md:flex lg:flex-row flex-col justify-between bg-[#f7e9e4] sm:w-[100%] xl:h-screen xl:w-screen gap-6 p-[30px] md:px-16">
-
+            <div className="md:flex lg:flex-row flex-col justify-between bg-[#f7e9e4] sm:w-[100%] xl:h-screen xl:w-screen gap-6 p-[30px] md:px-16" id="about">
                 <div className="flex flex-col w-[100%] justify-center gap-4">
 
                     <h1 className="text-center md:text-start">Sobre nós</h1>

@@ -1,6 +1,7 @@
 "use client";
 
 import type { Metadata } from "next";
+import { Montserrat } from "next/font/google";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -9,12 +10,19 @@ const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
-// export const metadata: Metadata = {
-//   title: "Girls In STEM",
-//   description: "By Aléxia Cazale",
-// };
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"], // Ajuste os pesos conforme necessário
+});
 
 const theme = createTheme({
+  typography: {
+    // 4. Defina a família da fonte
+    fontFamily: [
+      'Montserrat',
+    ].join(','),
+  },
   palette: {
     primary: {
       light: "#fff",
@@ -36,13 +44,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="pt-br" suppressHydrationWarning>
-      <body>
-        <ThemeProvider theme={theme}>
-          {children}
-        </ThemeProvider>
+      <body suppressHydrationWarning className={montserrat.className}>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
       </body>
     </html>
   );

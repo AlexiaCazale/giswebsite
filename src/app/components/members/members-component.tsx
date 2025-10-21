@@ -70,7 +70,7 @@ export const membersList = [
 export default function Member() {
   return (
     <React.Fragment>
-      <div className="flex bg-[#f2e4db] w-[100%] h-[100%] xl:w-screen p-[30px] md:px-16">
+      <div className="flex bg-[#f2e4db] w-[100%] h-[100%] xl:w-screen p-[30px] md:px-16" id="membros">
         <div className="hidden md:flex relative h-screen lg:w-1/3">
           <Image
             src={"/floral-9190055.svg"}

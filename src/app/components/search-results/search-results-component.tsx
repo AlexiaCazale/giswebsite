@@ -7,7 +7,7 @@ import { Accordion } from "@rewind-ui/core";
 export default function SearchResult() {
   return (
     <React.Fragment>
-      <div className="flex flex-col bg-[#f7e9e4] h-screen w-screen px-16 items-center">
+      <div className="flex flex-col bg-[#f7e9e4] h-screen w-screen px-16 items-center" id="resultados">
         <div className="flex items-center justify-center w-[100%]">
           <div className="w-1/3">
             <Accordion

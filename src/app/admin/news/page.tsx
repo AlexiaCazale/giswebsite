@@ -29,6 +29,19 @@ import {
 import { News, mockNews } from "@/app/lib/data";
 import { showSuccess } from "@/utils/toast";
 
+// 1. Importe o createTheme e o ThemeProvider do MUI
+import {
+  createTheme,
+  ThemeProvider as MuiThemeProvider,
+} from "@mui/material/styles";
+
+// 2. Crie um tema local que define a fonte padrão
+const muiTheme = createTheme({
+  typography: {
+    fontFamily: '"Montserrat", sans-serif',
+  },
+});
+
 const NewsPage = () => {
   const [news, setNews] = useState<News[]>(mockNews);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -83,156 +96,159 @@ const NewsPage = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <Typography variant="h5" component="h1" fontWeight="semibold">
-          Gerenciar Notícias
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<PlusCircleIcon />}
-          onClick={() => {
-            setEditingNews(null);
-            setNewNewsData({ title: "", author: "", publishDate: "", content: "" });
-            setIsDialogOpen(true);
-          }}
-        >
-          Adicionar Notícia
-        </Button>
-        <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-          <DialogTitle>{editingNews ? "Editar Notícia" : "Adicionar Nova Notícia"}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Preencha os detalhes da notícia aqui. Clique em salvar quando terminar.
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="title"
-              label="Título"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={newNewsData.title}
-              onChange={handleInputChange}
-              sx={{ mt: 2 }}
-            />
-            <TextField
-              margin="dense"
-              id="author"
-              label="Autor"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={newNewsData.author}
-              onChange={handleInputChange}
-              sx={{ mt: 2 }}
-            />
-            <TextField
-              margin="dense"
-              id="publishDate"
-              label="Data de Publicação"
-              type="date"
-              fullWidth
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-              value={newNewsData.publishDate}
-              onChange={handleInputChange}
-              sx={{ mt: 2 }}
-            />
-            <TextField
-              margin="dense"
-              id="content"
-              label="Conteúdo"
-              multiline
-              rows={4}
-              fullWidth
-              variant="outlined"
-              value={newNewsData.content}
-              onChange={handleInputChange}
-              sx={{ mt: 2 }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleAddNews} variant="contained">
-              {editingNews ? "Salvar Alterações" : "Adicionar Notícia"}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-      <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-        <CardHeader title={<Typography variant="h6">Lista de Notícias</Typography>} />
-        <CardContent>
-          {news.length === 0 ? (
-            <Typography color="textSecondary">
-              Nenhuma notícia encontrada.
-            </Typography>
-          ) : (
-            <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Título</TableCell>
-                    <TableCell>Autor</TableCell>
-                    <TableCell>Data de Publicação</TableCell>
-                    <TableCell align="right">Ações</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {news.map((newsItem) => (
-                    <TableRow key={newsItem.id}>
-                      <TableCell component="th" scope="row">
-                        {newsItem.title}
-                      </TableCell>
-                      <TableCell>{newsItem.author}</TableCell>
-                      <TableCell>{newsItem.publishDate}</TableCell>
-                      <TableCell align="right">
-                        <Button
-                          variant="text"
-                          size="small"
-                          onClick={() => handleEditClick(newsItem)}
-                          sx={{ minWidth: 'auto', p: 1 }}
-                        >
-                          <EditIcon fontSize="small" />
-                        </Button>
-                        <Button
-                          variant="text"
-                          size="small"
-                          onClick={() => confirmDelete(newsItem.id)}
-                          sx={{ minWidth: 'auto', p: 1, ml: 1 }}
-                        >
-                          <Trash2Icon fontSize="small" />
-                        </Button>
-                        <Dialog
-                          open={isConfirmDialogOpen && newsToDeleteId === newsItem.id}
-                          onClose={() => setIsConfirmDialogOpen(false)}
-                          aria-labelledby="alert-dialog-title"
-                          aria-describedby="alert-dialog-description"
-                        >
-                          <DialogTitle id="alert-dialog-title">{"Tem certeza?"}</DialogTitle>
-                          <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
-                              Esta ação não pode ser desfeita. Isso excluirá permanentemente a notícia.
-                            </DialogContentText>
-                          </DialogContent>
-                          <DialogActions>
-                            <Button onClick={() => setIsConfirmDialogOpen(false)}>Cancelar</Button>
-                            <Button onClick={handleDeleteConfirmed} autoFocus variant="contained" color="error">
-                              Continuar
-                            </Button>
-                          </DialogActions>
-                        </Dialog>
-                      </TableCell>
+    // 3. Envolva todo o conteúdo da página com o MuiThemeProvider
+    <MuiThemeProvider theme={muiTheme}>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <Typography variant="h5" component="h1" fontWeight="semibold">
+            Gerenciar Notícias
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<PlusCircleIcon />}
+            onClick={() => {
+              setEditingNews(null);
+              setNewNewsData({ title: "", author: "", publishDate: "", content: "" });
+              setIsDialogOpen(true);
+            }}
+          >
+            Adicionar Notícia
+          </Button>
+          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+            <DialogTitle>{editingNews ? "Editar Notícia" : "Adicionar Nova Notícia"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Preencha os detalhes da notícia aqui. Clique em salvar quando terminar.
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="title"
+                label="Título"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={newNewsData.title}
+                onChange={handleInputChange}
+                sx={{ mt: 2 }}
+              />
+              <TextField
+                margin="dense"
+                id="author"
+                label="Autor"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={newNewsData.author}
+                onChange={handleInputChange}
+                sx={{ mt: 2 }}
+              />
+              <TextField
+                margin="dense"
+                id="publishDate"
+                label="Data de Publicação"
+                type="date"
+                fullWidth
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                value={newNewsData.publishDate}
+                onChange={handleInputChange}
+                sx={{ mt: 2 }}
+              />
+              <TextField
+                margin="dense"
+                id="content"
+                label="Conteúdo"
+                multiline
+                rows={4}
+                fullWidth
+                variant="outlined"
+                value={newNewsData.content}
+                onChange={handleInputChange}
+                sx={{ mt: 2 }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={handleAddNews} variant="contained">
+                {editingNews ? "Salvar Alterações" : "Adicionar Notícia"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
+          <CardHeader title={<Typography variant="h6">Lista de Notícias</Typography>} />
+          <CardContent>
+            {news.length === 0 ? (
+              <Typography color="textSecondary">
+                Nenhuma notícia encontrada.
+              </Typography>
+            ) : (
+              <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Título</TableCell>
+                      <TableCell>Autor</TableCell>
+                      <TableCell>Data de Publicação</TableCell>
+                      <TableCell align="right">Ações</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+                  </TableHead>
+                  <TableBody>
+                    {news.map((newsItem) => (
+                      <TableRow key={newsItem.id}>
+                        <TableCell component="th" scope="row">
+                          {newsItem.title}
+                        </TableCell>
+                        <TableCell>{newsItem.author}</TableCell>
+                        <TableCell>{newsItem.publishDate}</TableCell>
+                        <TableCell align="right">
+                          <Button
+                            variant="text"
+                            size="small"
+                            onClick={() => handleEditClick(newsItem)}
+                            sx={{ minWidth: 'auto', p: 1 }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </Button>
+                          <Button
+                            variant="text"
+                            size="small"
+                            onClick={() => confirmDelete(newsItem.id)}
+                            sx={{ minWidth: 'auto', p: 1, ml: 1 }}
+                          >
+                            <Trash2Icon fontSize="small" />
+                          </Button>
+                          <Dialog
+                            open={isConfirmDialogOpen && newsToDeleteId === newsItem.id}
+                            onClose={() => setIsConfirmDialogOpen(false)}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                          >
+                            <DialogTitle id="alert-dialog-title">{"Tem certeza?"}</DialogTitle>
+                            <DialogContent>
+                              <DialogContentText id="alert-dialog-description">
+                                Esta ação não pode ser desfeita. Isso excluirá permanentemente a notícia.
+                              </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                              <Button onClick={() => setIsConfirmDialogOpen(false)}>Cancelar</Button>
+                              <Button onClick={handleDeleteConfirmed} autoFocus variant="contained" color="error">
+                                Continuar
+                              </Button>
+                            </DialogActions>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </MuiThemeProvider>
   );
 };
 

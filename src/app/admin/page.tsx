@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  Button,
-  TextField,
-  Typography,
-  Box,
-  Paper, // Usar Paper para o painel de login
-}
-  from "@mui/material";
+import { Button, TextField, Typography, Box, Paper } from "@mui/material";
 import { showSuccess, showError } from "@/utils/toast";
 import { useRouter } from "next/navigation";
 
@@ -20,93 +12,106 @@ const LoginPage = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulação de login: Em um aplicativo real, você faria uma chamada de API aqui.
 
-    // email: girlsinstemfatec@gmail.com
-    // password:  GirlsInStem!F@tec24
     if (email === "teste@teste.com" && password === "123") {
       showSuccess("Login realizado com sucesso!");
-      router.push("/admin/dashboard"); // Redireciona para o painel administrativo
+      localStorage.setItem("auth_token", "seu_token_simulado_aqui");
+      router.push("/admin/dashboard");
     } else {
       showError("Credenciais inválidas. Tente novamente.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-login-bg-page p-4">
+    // 1. Adicione 'relative' aqui no div principal
+    <div className="relative min-h-screen flex items-center justify-center bg-login-bg-page p-4 bg-[url(/heart-8908350.svg)] bg-cover bg-center ">
+      <div className="absolute inset-0 bg-black/50 z-0" />
+
       <Paper
-        elevation={3} // Adiciona uma sombra sutil
+        elevation={3}
         sx={{
-          width: '100%',
+          fontFamily: "Montserrat, sans-serif",
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
           maxWidth: 400,
-          borderRadius: '1rem', // Bordas arredondadas
-          p: 4, // Padding interno
-          bgcolor: 'background.paper', // Fundo branco para o painel
-          color: 'text.primary', // Cor do texto padrão
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          borderRadius: "2rem",
+          p: 4,
+          bgcolor: "#8E67A1", // A cor do painel continua sólida
+          color: "#ffffff",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        <Typography variant="h4" fontWeight="bold" sx={{ mb: 4 }}>
-          Girls In STEM
+        <Typography
+          fontFamily="Montserrat, sans-serif"
+          textTransform={"uppercase"}
+          variant="h5"
+          fontWeight="bold"
+          sx={{ mb: 2 }}
+        >
+          {"< Girls In STEM />"}
         </Typography>
 
-        <Typography variant="h6" sx={{ mb: 3 }}>
-          Login your account
+        <Typography
+          fontFamily="Montserrat, sans-serif"
+          variant="h6"
+          sx={{ mb: 3 }}
+        >
+          Acesse a área administrativa
         </Typography>
 
-        <Box component="form" onSubmit={handleLogin} sx={{ mt: 2, width: '100%' }}>
+        <Box component="form" onSubmit={handleLogin} sx={{ width: "100%" }}>
           <TextField
             margin="normal"
             required
             fullWidth
             id="email"
-            label="Username"
+            label="E-mail"
             name="email"
             autoComplete="email"
             autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             variant="standard"
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, fontFamily: "Montserrat, sans-serif" }}
           />
           <TextField
             margin="normal"
             required
             fullWidth
             name="password"
-            label="Password"
+            label="Senha"
             type="password"
             id="password"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             variant="standard"
-            sx={{ mb: 1 }}
+            sx={{ mb: 1, fontFamily: "Montserrat, sans-serif" }}
           />
-          {/* O link "forget password?" foi removido daqui */}
           <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{
               py: 1.5,
-              fontSize: '1rem',
-              bgcolor: 'login-button-bg.DEFAULT',
-              color: 'login-button-bg.foreground',
-              '&:hover': {
-                bgcolor: 'login-button-bg.DEFAULT',
+              fontSize: "1rem",
+              bgcolor: "#FAD4E1",
+              fontFamily: "Montserrat, sans-serif",
+              color: "#000000",
+              "&:hover": {
+                bgcolor: "#EF9FCF",
                 opacity: 0.9,
               },
-              borderRadius: '0.5rem',
-              mt: 3, // Adiciona margem superior para compensar a remoção do link
+              borderRadius: "2rem",
+              mt: 3,
             }}
           >
-            Login
+            Entrar
           </Button>
         </Box>
-        {/* O botão "Create Account" foi removido daqui */}
       </Paper>
     </div>
   );

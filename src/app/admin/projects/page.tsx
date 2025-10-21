@@ -39,6 +39,19 @@ import {
 import { showSuccess } from "@/utils/toast";
 import { mockProjects, Project } from "@/app/lib/data";
 
+// 1. Importe o createTheme e o ThemeProvider do MUI
+import {
+  createTheme,
+  ThemeProvider as MuiThemeProvider,
+} from "@mui/material/styles";
+
+// 2. Crie um tema local que define a fonte padrão
+const muiTheme = createTheme({
+  typography: {
+    fontFamily: '"Montserrat", sans-serif',
+  },
+});
+
 const ProjectsPage = () => {
   const [projects, setProjects] = useState<Project[]>(mockProjects);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -149,165 +162,168 @@ const ProjectsPage = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <Typography variant="h5" component="h1" fontWeight="semibold">
-          Gerenciar Projetos
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<PlusCircleIcon />}
-          onClick={() => {
-            setEditingProject(null);
-            setNewProjectData({ name: "", status: "Pendente", startDate: "", endDate: "" });
-            setIsDialogOpen(true);
-          }}
-        >
-          Adicionar Projeto
-        </Button>
+    // 3. Envolva todo o conteúdo da página com o MuiThemeProvider
+    <MuiThemeProvider theme={muiTheme}>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <Typography variant="h5" component="h1" fontWeight="semibold">
+            Gerenciar Projetos
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<PlusCircleIcon />}
+            onClick={() => {
+              setEditingProject(null);
+              setNewProjectData({ name: "", status: "Pendente", startDate: "", endDate: "" });
+              setIsDialogOpen(true);
+            }}
+          >
+            Adicionar Projeto
+          </Button>
 
-        <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-          <DialogTitle>{editingProject ? "Editar Projeto" : "Adicionar Novo Projeto"}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Preencha os detalhes do projeto aqui. Clique em salvar quando terminar.
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="Nome"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={newProjectData.name}
-              onChange={handleInputChange}
-              sx={{ mt: 2 }}
-            />
-            <FormControl fullWidth margin="dense" sx={{ mt: 2 }}>
-              <InputLabel id="status-label">Status</InputLabel>
-              <Select
-                labelId="status-label"
-                id="status"
-                name="status"
-                value={newProjectData.status}
-                label="Status"
+          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+            <DialogTitle>{editingProject ? "Editar Projeto" : "Adicionar Novo Projeto"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Preencha os detalhes do projeto aqui. Clique em salvar quando terminar.
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="name"
+                label="Nome"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={newProjectData.name}
                 onChange={handleInputChange}
-              >
-                <MenuItem value="Pendente">Pendente</MenuItem>
-                <MenuItem value="Em Andamento">Em Andamento</MenuItem>
-                <MenuItem value="Concluído">Concluído</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              margin="dense"
-              id="startDate"
-              label="Data Início"
-              type="date"
-              fullWidth
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-              value={newProjectData.startDate}
-              onChange={handleInputChange}
-              sx={{ mt: 2 }}
-            />
-            <TextField
-              margin="dense"
-              id="endDate"
-              label="Data Fim"
-              type="date"
-              fullWidth
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-              value={newProjectData.endDate || ""}
-              onChange={handleInputChange}
-              sx={{ mt: 2 }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleAddProject} variant="contained">
-              {editingProject ? "Salvar Alterações" : "Adicionar Projeto"}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-      <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-        <CardHeader title={<Typography variant="h6">Lista de Projetos</Typography>} />
-        <CardContent>
-          {projects.length === 0 ? (
-            <Typography color="textSecondary">
-              Nenhum projeto encontrado.
-            </Typography>
-          ) : (
-            <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Nome</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Data Início</TableCell>
-                    <TableCell>Data Fim</TableCell>
-                    <TableCell align="right">Ações</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {projects.map((project) => (
-                    <TableRow key={project.id}>
-                      <TableCell component="th" scope="row">
-                        {project.name}
-                      </TableCell>
-                      <TableCell>
-                        <Chip {...getStatusChipProps(project.status)} size="small" />
-                      </TableCell>
-                      <TableCell>{project.startDate}</TableCell>
-                      <TableCell>{project.endDate || "N/A"}</TableCell>
-                      <TableCell align="right">
-                        <Button
-                          variant="text"
-                          size="small"
-                          onClick={() => handleEditClick(project)}
-                          sx={{ minWidth: 'auto', p: 1 }}
-                        >
-                          <EditIcon fontSize="small" />
-                        </Button>
-                        <Button
-                          variant="text"
-                          size="small"
-                          onClick={() => confirmDelete(project.id)}
-                          sx={{ minWidth: 'auto', p: 1, ml: 1 }}
-                        >
-                          <Trash2Icon fontSize="small" />
-                        </Button>
-                        <Dialog
-                          open={isConfirmDialogOpen && projectToDeleteId === project.id}
-                          onClose={() => setIsConfirmDialogOpen(false)}
-                          aria-labelledby="alert-dialog-title"
-                          aria-describedby="alert-dialog-description"
-                        >
-                          <DialogTitle id="alert-dialog-title">{"Tem certeza?"}</DialogTitle>
-                          <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
-                              Esta ação não pode ser desfeita. Isso excluirá permanentemente o projeto.
-                            </DialogContentText>
-                          </DialogContent>
-                          <DialogActions>
-                            <Button onClick={() => setIsConfirmDialogOpen(false)}>Cancelar</Button>
-                            <Button onClick={handleDeleteConfirmed} autoFocus variant="contained" color="error">
-                              Continuar
-                            </Button>
-                          </DialogActions>
-                        </Dialog>
-                      </TableCell>
+                sx={{ mt: 2 }}
+              />
+              <FormControl fullWidth margin="dense" sx={{ mt: 2 }}>
+                <InputLabel id="status-label">Status</InputLabel>
+                <Select
+                  labelId="status-label"
+                  id="status"
+                  name="status"
+                  value={newProjectData.status}
+                  label="Status"
+                  onChange={handleInputChange}
+                >
+                  <MenuItem value="Pendente">Pendente</MenuItem>
+                  <MenuItem value="Em Andamento">Em Andamento</MenuItem>
+                  <MenuItem value="Concluído">Concluído</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                margin="dense"
+                id="startDate"
+                label="Data Início"
+                type="date"
+                fullWidth
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                value={newProjectData.startDate}
+                onChange={handleInputChange}
+                sx={{ mt: 2 }}
+              />
+              <TextField
+                margin="dense"
+                id="endDate"
+                label="Data Fim"
+                type="date"
+                fullWidth
+                variant="outlined"
+                InputLabelProps={{ shrink: true }}
+                value={newProjectData.endDate || ""}
+                onChange={handleInputChange}
+                sx={{ mt: 2 }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={handleAddProject} variant="contained">
+                {editingProject ? "Salvar Alterações" : "Adicionar Projeto"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
+        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
+          <CardHeader title={<Typography variant="h6">Lista de Projetos</Typography>} />
+          <CardContent>
+            {projects.length === 0 ? (
+              <Typography color="textSecondary">
+                Nenhum projeto encontrado.
+              </Typography>
+            ) : (
+              <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Nome</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Data Início</TableCell>
+                      <TableCell>Data Fim</TableCell>
+                      <TableCell align="right">Ações</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+                  </TableHead>
+                  <TableBody>
+                    {projects.map((project) => (
+                      <TableRow key={project.id}>
+                        <TableCell component="th" scope="row">
+                          {project.name}
+                        </TableCell>
+                        <TableCell>
+                          <Chip {...getStatusChipProps(project.status)} size="small" />
+                        </TableCell>
+                        <TableCell>{project.startDate}</TableCell>
+                        <TableCell>{project.endDate || "N/A"}</TableCell>
+                        <TableCell align="right">
+                          <Button
+                            variant="text"
+                            size="small"
+                            onClick={() => handleEditClick(project)}
+                            sx={{ minWidth: 'auto', p: 1 }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </Button>
+                          <Button
+                            variant="text"
+                            size="small"
+                            onClick={() => confirmDelete(project.id)}
+                            sx={{ minWidth: 'auto', p: 1, ml: 1 }}
+                          >
+                            <Trash2Icon fontSize="small" />
+                          </Button>
+                          <Dialog
+                            open={isConfirmDialogOpen && projectToDeleteId === project.id}
+                            onClose={() => setIsConfirmDialogOpen(false)}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                          >
+                            <DialogTitle id="alert-dialog-title">{"Tem certeza?"}</DialogTitle>
+                            <DialogContent>
+                              <DialogContentText id="alert-dialog-description">
+                                Esta ação não pode ser desfeita. Isso excluirá permanentemente o projeto.
+                              </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                              <Button onClick={() => setIsConfirmDialogOpen(false)}>Cancelar</Button>
+                              <Button onClick={handleDeleteConfirmed} autoFocus variant="contained" color="error">
+                                Continuar
+                              </Button>
+                            </DialogActions>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </MuiThemeProvider>
   );
 };
 
