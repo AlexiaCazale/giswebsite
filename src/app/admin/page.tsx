@@ -25,12 +25,12 @@ const LoginPage = () => {
   return (
     // 1. Adicione 'relative' aqui no div principal
     <div className="relative min-h-screen flex items-center justify-center bg-login-bg-page p-4 bg-[url(/heart-8908350.svg)] bg-cover bg-center ">
-      <div className="absolute inset-0 bg-black/50 z-0" />
+      <div className="absolute inset-0 bg-black/20 z-0" />
 
       <Paper
         elevation={3}
         sx={{
-          fontFamily: "Montserrat, sans-serif",
+          // fontFamily removido daqui
           position: "relative",
           zIndex: 1,
           width: "100%",
@@ -45,7 +45,7 @@ const LoginPage = () => {
         }}
       >
         <Typography
-          fontFamily="Montserrat, sans-serif"
+          // fontFamily removido daqui
           textTransform={"uppercase"}
           variant="h5"
           fontWeight="bold"
@@ -55,7 +55,7 @@ const LoginPage = () => {
         </Typography>
 
         <Typography
-          fontFamily="Montserrat, sans-serif"
+          // fontFamily removido daqui
           variant="h6"
           sx={{ mb: 3 }}
         >
@@ -75,7 +75,30 @@ const LoginPage = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             variant="standard"
-            sx={{ mb: 2, fontFamily: "Montserrat, sans-serif" }}
+            sx={{
+              mb: 2,
+              // fontFamily removido daqui
+              // Estilos para o input branco:
+              "& .MuiInputBase-input": {
+                color: "#ffffff", // Cor do texto digitado
+              },
+              "& .MuiInputLabel-root": {
+                color: "rgba(255, 255, 255, 0.9)", // Cor da label
+              },
+              "& .MuiInput-underline:before": {
+                borderBottomColor: "rgba(255, 255, 255, 0.7)", // Cor da linha
+              },
+              "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
+                borderBottomColor: "#ffffff", // Cor da linha ao passar o mouse
+              },
+              // Cor da label e linha quando focado
+              "& .MuiInput-underline:after": {
+                borderBottomColor: "#FAD4E1",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "#FAD4E1",
+              },
+            }}
           />
           <TextField
             margin="normal"
@@ -89,7 +112,30 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             variant="standard"
-            sx={{ mb: 1, fontFamily: "Montserrat, sans-serif" }}
+            sx={{
+              mb: 1,
+              // fontFamily removido daqui
+              // Estilos para o input branco:
+              "& .MuiInputBase-input": {
+                color: "#ffffff", // Cor do texto digitado
+              },
+              "& .MuiInputLabel-root": {
+                color: "rgba(255, 255, 255, 0.9)", // Cor da label
+              },
+              "& .MuiInput-underline:before": {
+                borderBottomColor: "rgba(255, 255, 255, 0.7)", // Cor da linha
+              },
+              "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
+                borderBottomColor: "#ffffff", // Cor da linha ao passar o mouse
+              },
+              // Cor da label e linha quando focado
+              "& .MuiInput-underline:after": {
+                borderBottomColor: "#FAD4E1",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "#FAD4E1",
+              },
+            }}
           />
           <Button
             type="submit"
@@ -99,7 +145,7 @@ const LoginPage = () => {
               py: 1.5,
               fontSize: "1rem",
               bgcolor: "#FAD4E1",
-              fontFamily: "Montserrat, sans-serif",
+              // fontFamily removido daqui
               color: "#000000",
               "&:hover": {
                 bgcolor: "#EF9FCF",
