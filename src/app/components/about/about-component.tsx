@@ -54,7 +54,7 @@ export default function About() {
                     </div>
                 </div>
 
-                <div className="hidden md:flex relative h-screen md:w-[100%] lg:w-1/2">
+                <div className="hidden lg:flex relative h-screen md:w-[100%] lg:w-1/2">
                     <Image
                         src={"/heart-8564951.svg"}
                         alt="flower"

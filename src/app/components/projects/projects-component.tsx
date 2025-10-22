@@ -75,7 +75,7 @@ export default function Projects() {
           </div>
           <SlideComponentProjects />
         </div>
-        <div className="hidden md:flex relative h-screen md:w-[100%] md:w-1/3">
+        <div className="hidden lg:flex relative h-screen md:w-[100%] md:w-1/3">
           <Image
             src="/floral-9190052.svg"
             alt="flower"
