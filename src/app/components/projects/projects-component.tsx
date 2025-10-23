@@ -67,7 +67,7 @@ export const dataProjects = [
 export default function Projects() {
   return (
     <React.Fragment>
-      <div className="lg:flex md:flex-row flex-col bg-[#2f3e43] justify-between h-[100%] w-[100%] lg:h-screen lg:w-screen p-[30px] md:px-16" id="projetos">
+      <div className="flex md:flex-row flex-col bg-[#2f3e43] justify-between h-screen w-[100%] lg:w-screen p-[30px] md:px-16 items-center justify-center" id="projetos">
         <div className="flex flex-col w-[100%] lg:w-2/3 justify-center gap-6 text-[#f4f0e5]">
           <div>
             <h1 className=" text-center md:text-start">Projetos</h1>

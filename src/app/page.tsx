@@ -24,9 +24,9 @@ export default function Home() {
         <Welcome />
         <About />
         <FatecJahu />
-        <SearchResult />
         <Projects />
         <News />
+        <SearchResult />
         <Member />
         <Contact />
         <FooterComponent />

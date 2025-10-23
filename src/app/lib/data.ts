@@ -42,7 +42,6 @@ export const mockMembers: Member[] = [
 export interface Project {
   id: string;
   name: string;
-  status: "Em Andamento" | "Concluído" | "Pendente";
   startDate: string;
   endDate?: string;
   members: string[]; // IDs of members
@@ -52,21 +51,18 @@ export const mockProjects: Project[] = [
   {
     id: "p1",
     name: "Plataforma de Mentoria Online",
-    status: "Em Andamento",
     startDate: "2023-02-01",
     members: ["1", "2"],
   },
   {
     id: "p2",
     name: "Aplicativo de Aprendizado STEM",
-    status: "Em Andamento",
     startDate: "2023-04-10",
     members: ["1", "3"],
   },
   {
     id: "p3",
     name: "Website Institucional Girls in STEM",
-    status: "Concluído",
     startDate: "2022-11-01",
     endDate: "2023-01-30",
     members: ["2", "4"],
@@ -74,7 +70,6 @@ export const mockProjects: Project[] = [
   {
     id: "p4",
     name: "Workshop de Introdução à IA",
-    status: "Pendente",
     startDate: "2024-01-01",
     members: ["3"],
   },

@@ -30,6 +30,7 @@ import {
   ChipProps,
   SxProps,
   Theme,
+  Box,
 } from "@mui/material";
 import {
   AddCircleOutline as PlusCircleIcon,
@@ -39,17 +40,111 @@ import {
 import { showSuccess } from "@/utils/toast";
 import { mockProjects, Project } from "@/app/lib/data";
 
-// 1. Importe o createTheme e o ThemeProvider do MUI
 import {
   createTheme,
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
 
-// 2. Crie um tema local que define a fonte padrão
 const muiTheme = createTheme({
   typography: {
     fontFamily: '"Montserrat", sans-serif',
   },
+  palette: {
+    mode: "dark",
+    background: {
+      default: "#181c2c",
+      paper: "#2d303f",
+    },
+    // Removi a cor primária de destaque (azul) daqui para não afetar os botões "Adicionar"
+    // Agora, se quiser um botão de destaque, terá que especificar a cor manualmente.
+    // primary: {
+    //   main: "#00e5ff",
+    //   contrastText: "#000000",
+    // },
+    secondary: {
+      main: "#ff4081",
+    },
+    error: {
+      main: "#ff6b6b",
+    },
+    success: { // Adicionado para chips
+        main: '#4CAF50', // Exemplo de verde
+        dark: '#2E7D32', // Verde mais escuro
+    },
+    warning: { // Adicionado para chips
+        main: '#FFC107', // Exemplo de amarelo
+        dark: '#FFA000', // Laranja mais escuro
+    },
+    text: {
+      primary: "#ffffff",
+      secondary: "#b0b0b0",
+    },
+  },
+  components: {
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          color: '#ffffff', // Cor do texto do input
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.5)',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.7)', // Um tom de cinza claro para o foco
+          },
+        },
+      },
+    },
+    MuiInputLabel: {
+        styleOverrides: {
+            root: {
+                color: 'rgba(255, 255, 255, 0.7)',
+                '&.Mui-focused': {
+                    color: 'rgba(255, 255, 255, 0.9)',
+                }
+            }
+        }
+    },
+    MuiTableCell: {
+        styleOverrides: {
+            root: {
+                color: '#ffffff',
+                borderColor: '#2d303f',
+            },
+            head: {
+                backgroundColor: '#2d303f',
+                color: '#ffffff',
+            }
+        }
+    },
+    // Estilo para Select (MenuItem)
+    MuiMenu: {
+        styleOverrides: {
+            paper: {
+                backgroundColor: '#2d303f', // Fundo do dropdown do Select
+                color: '#ffffff',
+            },
+        },
+    },
+    MuiMenuItem: {
+        styleOverrides: {
+            root: {
+                color: '#ffffff',
+                '&:hover': {
+                    backgroundColor: '#3f485c', // Cor de hover para itens do dropdown
+                },
+                '&.Mui-selected': {
+                    backgroundColor: '#3f485c', // Cor de seleção para itens do dropdown
+                    '&:hover': {
+                        backgroundColor: '#3f485c',
+                    },
+                },
+            },
+        },
+    },
+  }
 });
 
 const ProjectsPage = () => {
@@ -57,7 +152,7 @@ const ProjectsPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [newProjectData, setNewProjectData] = useState<Omit<Project, "id" | "members"> & { id?: string, members?: string }>(
-    { name: "", status: "Pendente", startDate: "", endDate: "" }
+    { name: "", startDate: "", endDate: "" }
   );
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [projectToDeleteId, setProjectToDeleteId] = useState<string | null>(null);
@@ -77,7 +172,7 @@ const ProjectsPage = () => {
     }
     setIsDialogOpen(false);
     setEditingProject(null);
-    setNewProjectData({ name: "", status: "Pendente", startDate: "", endDate: "" });
+    setNewProjectData({ name: "", startDate: "", endDate: "" });
   };
 
   const handleEditClick = (project: Project) => {
@@ -114,55 +209,7 @@ const ProjectsPage = () => {
     }));
   };
 
-  type StatusChipProps = {
-    label: string;
-    size: 'small';
-    sx: SxProps<Theme>;
-  };
-
-  const getStatusChipProps = (status: string): StatusChipProps => {
-    switch (status) {
-      case 'Concluído':
-        return {
-          size: 'small', // Include size here for a cleaner call
-          label: 'Concluído',
-          sx: {
-            bgcolor: 'hsl(142.1 76.2% 36.3%)', // Example: Green background
-            color: 'hsl(142.1 70.2% 80.3%)',   // Example: Light text
-          },
-        };
-      case 'Em Andamento':
-        return {
-          size: 'small',
-          label: 'Em Andamento',
-          sx: {
-            bgcolor: 'hsl(47.9 95.8% 53.1%)', // Example: Yellow background
-            color: 'hsl(47.9 95.8% 30.1%)',
-          },
-        };
-      case 'Pendente':
-        return {
-          size: 'small',
-          label: 'Pendente',
-          sx: {
-            bgcolor: 'hsl(210 40% 96.1%)', // Example: Light Gray
-            color: 'hsl(210 40% 40.1%)',
-          },
-        };
-      default:
-        return {
-          size: 'small',
-          label: 'Desconhecido',
-          sx: {
-            bgcolor: 'hsl(0 0% 80%)',
-            color: 'hsl(0 0% 20%)',
-          },
-        };
-    }
-  };
-
   return (
-    // 3. Envolva todo o conteúdo da página com o MuiThemeProvider
     <MuiThemeProvider theme={muiTheme}>
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -171,20 +218,30 @@ const ProjectsPage = () => {
           </Typography>
           <Button
             variant="contained"
+            // MUDANÇA: Removido color="primary". Definindo cor de fundo manualmente.
+            sx={{
+                bgcolor: '#3f485c', // Cor de fundo neutra, mas visível
+                color: 'white',
+                '&:hover': {
+                    bgcolor: '#4f5a70', // Cor um pouco mais clara no hover
+                },
+            }}
             startIcon={<PlusCircleIcon />}
             onClick={() => {
               setEditingProject(null);
-              setNewProjectData({ name: "", status: "Pendente", startDate: "", endDate: "" });
+              setNewProjectData({ name: "", startDate: "", endDate: "" });
               setIsDialogOpen(true);
             }}
           >
             Adicionar Projeto
           </Button>
 
-          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-            <DialogTitle>{editingProject ? "Editar Projeto" : "Adicionar Novo Projeto"}</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
+          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} PaperProps={{ sx: { bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary } }}>
+            <DialogTitle sx={{ backgroundColor: muiTheme.palette.background.default, color: muiTheme.palette.text.primary }}>
+                {editingProject ? "Editar Projeto" : "Adicionar Novo Projeto"}
+            </DialogTitle>
+            <DialogContent sx={{backgroundColor: muiTheme.palette.background.paper}}>
+              <DialogContentText color={muiTheme.palette.text.secondary}>
                 Preencha os detalhes do projeto aqui. Clique em salvar quando terminar.
               </DialogContentText>
               <TextField
@@ -192,6 +249,7 @@ const ProjectsPage = () => {
                 margin="dense"
                 id="name"
                 label="Nome"
+                name="name"
                 type="text"
                 fullWidth
                 variant="outlined"
@@ -199,25 +257,11 @@ const ProjectsPage = () => {
                 onChange={handleInputChange}
                 sx={{ mt: 2 }}
               />
-              <FormControl fullWidth margin="dense" sx={{ mt: 2 }}>
-                <InputLabel id="status-label">Status</InputLabel>
-                <Select
-                  labelId="status-label"
-                  id="status"
-                  name="status"
-                  value={newProjectData.status}
-                  label="Status"
-                  onChange={handleInputChange}
-                >
-                  <MenuItem value="Pendente">Pendente</MenuItem>
-                  <MenuItem value="Em Andamento">Em Andamento</MenuItem>
-                  <MenuItem value="Concluído">Concluído</MenuItem>
-                </Select>
-              </FormControl>
               <TextField
                 margin="dense"
                 id="startDate"
                 label="Data Início"
+                name="startDate"
                 type="date"
                 fullWidth
                 variant="outlined"
@@ -230,6 +274,7 @@ const ProjectsPage = () => {
                 margin="dense"
                 id="endDate"
                 label="Data Fim"
+                name="endDate"
                 type="date"
                 fullWidth
                 variant="outlined"
@@ -239,28 +284,47 @@ const ProjectsPage = () => {
                 sx={{ mt: 2 }}
               />
             </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={handleAddProject} variant="contained">
+            <DialogActions sx={{ backgroundColor: muiTheme.palette.background.paper }}>
+              <Button onClick={() => setIsDialogOpen(false)} color="inherit">Cancelar</Button>
+              <Button 
+                onClick={handleAddProject} 
+                variant="contained" 
+                // MUDANÇA: Removido color="primary". Definindo cor de fundo manualmente.
+                sx={{
+                    bgcolor: '#3f485c', // Cor de fundo neutra
+                    color: 'white',
+                    '&:hover': {
+                        bgcolor: '#4f5a70', // Cor um pouco mais clara no hover
+                    },
+                }}
+              >
                 {editingProject ? "Salvar Alterações" : "Adicionar Projeto"}
               </Button>
             </DialogActions>
           </Dialog>
         </div>
-        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-          <CardHeader title={<Typography variant="h6">Lista de Projetos</Typography>} />
+        
+        <Card sx={{ bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary }}>
+          <CardHeader title={<Typography variant="h6" color="white">Lista de Projetos</Typography>} />
           <CardContent>
             {projects.length === 0 ? (
-              <Typography color="textSecondary">
+              <Typography color="white">
                 Nenhum projeto encontrado.
               </Typography>
             ) : (
-              <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+              <TableContainer 
+                component={Paper} 
+                sx={{ 
+                    backgroundColor: muiTheme.palette.background.paper,
+                    color: muiTheme.palette.text.primary, 
+                    boxShadow: 'none',
+                    border: '1px solid #3f485c',
+                }}
+              >
                 <Table>
                   <TableHead>
                     <TableRow>
                       <TableCell>Nome</TableCell>
-                      <TableCell>Status</TableCell>
                       <TableCell>Data Início</TableCell>
                       <TableCell>Data Fim</TableCell>
                       <TableCell align="right">Ações</TableCell>
@@ -268,12 +332,9 @@ const ProjectsPage = () => {
                   </TableHead>
                   <TableBody>
                     {projects.map((project) => (
-                      <TableRow key={project.id}>
+                      <TableRow key={project.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell component="th" scope="row">
                           {project.name}
-                        </TableCell>
-                        <TableCell>
-                          <Chip {...getStatusChipProps(project.status)} size="small" />
                         </TableCell>
                         <TableCell>{project.startDate}</TableCell>
                         <TableCell>{project.endDate || "N/A"}</TableCell>
@@ -282,7 +343,7 @@ const ProjectsPage = () => {
                             variant="text"
                             size="small"
                             onClick={() => handleEditClick(project)}
-                            sx={{ minWidth: 'auto', p: 1 }}
+                            sx={{ minWidth: 'auto', p: 1, color: muiTheme.palette.text.secondary }}
                           >
                             <EditIcon fontSize="small" />
                           </Button>
@@ -290,6 +351,7 @@ const ProjectsPage = () => {
                             variant="text"
                             size="small"
                             onClick={() => confirmDelete(project.id)}
+                            color="error"
                             sx={{ minWidth: 'auto', p: 1, ml: 1 }}
                           >
                             <Trash2Icon fontSize="small" />
@@ -297,17 +359,18 @@ const ProjectsPage = () => {
                           <Dialog
                             open={isConfirmDialogOpen && projectToDeleteId === project.id}
                             onClose={() => setIsConfirmDialogOpen(false)}
+                            PaperProps={{ sx: { bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary } }}
                             aria-labelledby="alert-dialog-title"
                             aria-describedby="alert-dialog-description"
                           >
-                            <DialogTitle id="alert-dialog-title">{"Tem certeza?"}</DialogTitle>
-                            <DialogContent>
-                              <DialogContentText id="alert-dialog-description">
+                            <DialogTitle id="alert-dialog-title" sx={{ backgroundColor: muiTheme.palette.background.default, color: muiTheme.palette.text.primary }}>{"Tem certeza?"}</DialogTitle>
+                            <DialogContent sx={{backgroundColor: muiTheme.palette.background.paper}}>
+                              <DialogContentText id="alert-dialog-description" color={muiTheme.palette.text.secondary}>
                                 Esta ação não pode ser desfeita. Isso excluirá permanentemente o projeto.
                               </DialogContentText>
                             </DialogContent>
-                            <DialogActions>
-                              <Button onClick={() => setIsConfirmDialogOpen(false)}>Cancelar</Button>
+                            <DialogActions sx={{ backgroundColor: muiTheme.palette.background.paper }}>
+                              <Button onClick={() => setIsConfirmDialogOpen(false)} color="inherit">Cancelar</Button>
                               <Button onClick={handleDeleteConfirmed} autoFocus variant="contained" color="error">
                                 Continuar
                               </Button>

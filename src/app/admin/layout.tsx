@@ -25,9 +25,7 @@ import {
   Logout as LogoutIcon,
 } from "@mui/icons-material";
 import { useIsMobile } from "../hooks/use-mobile";
-// import { ThemeToggle } from "../components/ui/theme-toggle"; // Removido
 import { usePathname } from "next/navigation";
-// import MuiThemeProviderWrapper from "../components/ui/MuiThemeProviderWrapper"; // Removido
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -37,16 +35,30 @@ import {
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
 // Ajuste o caminho se necessário, baseado no seu arquivo DashboardPage
-import { ThemeProvider as NextThemesProvider } from "../components/ui/theme-provider"; 
+import { ThemeProvider as NextThemesProvider } from "../components/ui/theme-provider";
 
 const drawerWidth = 240;
 
 // 2. Crie seu tema MUI global aqui
+// Adicionado palette para definir o fundo e a cor padrão do texto.
 const muiTheme = createTheme({
   typography: {
     fontFamily: '"Montserrat", sans-serif',
   },
-  // Adicione suas cores personalizadas do MUI aqui se precisar
+  palette: {
+    mode: "dark", // Isso configura o MUI para um tema escuro
+    background: {
+      default: "#181c2c",
+      paper: "#181c2c",
+    },
+    primary: {
+      main: "#4caf50", // Exemplo de cor primária
+    },
+    text: {
+      primary: "#ffffff",
+      secondary: "#b0b0b0",
+    },
+  },
 });
 
 
@@ -79,7 +91,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // if (isLoading) return;
     // if (!isAuthenticated && !isLoginPage) {
-    //   router.push(LOGIN_PATH);
+    //   router.push(LOGIN_PATH);
     // }
     if (isAuthenticated && isLoginPage) {
       router.push("/admin/dashboard");
@@ -113,6 +125,8 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               justifyContent: "center",
               alignItems: "center",
               height: "100vh",
+              backgroundColor: "#181c2c", // 👈 Adicionado background na tela de loading
+              color: "white",
             }}
           >
             <p>Verificando autenticação...</p>
@@ -126,7 +140,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     return (
       <NextThemesProvider forcedTheme="light" attribute="class">
         <MuiThemeProvider theme={muiTheme}>
-          {children}
+          {/* Adicionado background na Box/div que envolve a tela de login */}
+          <Box sx={{ minHeight: '100vh', bgcolor: '#181c2c', color: 'white' }}>
+            {children}
+          </Box>
         </MuiThemeProvider>
       </NextThemesProvider>
     );
@@ -135,14 +152,14 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const drawer = (
     <Box
       onClick={handleDrawerToggle}
-      sx={{ textAlign: "center", bgcolor: "sidebar.DEFAULT", height: "100%" }}
+      sx={{ textAlign: "center", bgcolor: "#181c2c", height: "100%" }}
     >
-      <Toolbar sx={{ bgcolor: "sidebar.DEFAULT" }}>
+      <Toolbar sx={{ bgcolor: "#181c2c" }}>
         <Typography
           variant="h6"
           sx={{
             my: 2,
-            color: "sidebar.primary-foreground",
+            color: "white",
           }}
         >
           Girls in STEM
@@ -160,25 +177,25 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 py: 1.5,
                 px: 2,
                 "&.Mui-selected": {
-                  bgcolor: "admin-active.DEFAULT",
-                  color: "admin-active.foreground",
+                  bgcolor: "#0e111cff", // Ligeiramente mais escuro para indicar seleção
+                  color: "white",
                   "&:hover": {
-                    bgcolor: "admin-active.DEFAULT",
+                    bgcolor: "#0e111cff",
                   },
                   "& .MuiListItemIcon-root": {
-                    color: "admin-active.foreground",
+                    color: "white",
                   },
                 },
                 "&:hover": {
-                  bgcolor: "sidebar.accent",
+                  bgcolor: "#0e111cff",
                   "& .MuiListItemIcon-root": {
-                    color: "sidebar.accent-foreground",
+                    color: "white",
                   },
                 },
-                color: "sidebar.foreground",
+                color: "white",
               }}
             >
-              <ListItemIcon sx={{ color: "inherit" }}>
+              <ListItemIcon sx={{ color: "inherit", bgcolor: "inherit" }}>
                 {item.icon}
               </ListItemIcon>
               <ListItemText primary={item.text} />
@@ -191,20 +208,20 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     // 4. Envolva todo o layout nos provedores
-    <NextThemesProvider 
-      forcedTheme="light" 
-      attribute="class" 
+    <NextThemesProvider
+      forcedTheme="light"
+      attribute="class"
       enableSystem={false}
     >
       <MuiThemeProvider theme={muiTheme}>
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: "flex", bgcolor: "#181c2c", minHeight: '100vh' }}> {/* 👈 Adicionado background no box raiz */}
           <AppBar
             position="fixed"
             sx={{
               width: { sm: `calc(100% - ${drawerWidth}px)` },
               ml: { sm: `${drawerWidth}px` },
-              bgcolor: "background.paper",
-              color: "text.primary",
+              bgcolor: "#181c2c", // 👈 Corrigido o bgcolor do AppBar
+              color: "white",
               boxShadow: "none",
               borderBottom: "1px solid hsl(var(--border))",
             }}
@@ -228,18 +245,18 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 {navItems.find((item) => pathname.startsWith(item.path))?.text ||
                   "Admin"}
               </Typography>
-              
+
               {/* ThemeToggle foi removido */}
-              
+
               <IconButton
                 color="inherit"
                 aria-label="logout"
                 onClick={handleLogout}
                 sx={{
                   ml: 1,
-                  color: "text.primary",
+                  color: "white", // Ajustado para ser branco
                   "&:hover": {
-                    backgroundColor: "rgba(0, 0, 0, 0.04)",
+                    backgroundColor: "rgba(255, 255, 255, 0.04)",
                   },
                 }}
               >
@@ -263,7 +280,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 "& .MuiDrawer-paper": {
                   boxSizing: "border-box",
                   width: drawerWidth,
-                  bgcolor: "sidebar.DEFAULT",
+                  bgcolor: "#181c2c",
                   borderColor: "sidebar.border",
                 },
               }}
@@ -278,6 +295,8 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               p: 3,
               width: { sm: `calc(100% - ${drawerWidth}px)` },
               mt: { xs: "56px", sm: "64px" },
+              bgcolor: "#181c2c", // 👈 Adicionado background na área principal
+              color: "white",
             }}
           >
             {children}

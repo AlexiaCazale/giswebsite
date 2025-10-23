@@ -24,7 +24,7 @@ const LoginPage = () => {
 
   return (
     // 1. Adicione 'relative' aqui no div principal
-    <div className="relative min-h-screen flex items-center justify-center bg-login-bg-page p-4 bg-[url(/heart-8908350.svg)] bg-cover bg-center ">
+    <div className="relative min-h-screen flex items-center justify-center bg-login-bg-page p-4 bg-[url(/textile-9546497.svg)] bg-cover bg-center ">
       <div className="absolute inset-0 bg-black/20 z-0" />
 
       <Paper
@@ -37,7 +37,7 @@ const LoginPage = () => {
           maxWidth: 400,
           borderRadius: "2rem",
           p: 4,
-          bgcolor: "#8E67A1", // A cor do painel continua sólida
+          bgcolor: "#181c2c", // A cor do painel continua sólida
           color: "#ffffff",
           display: "flex",
           flexDirection: "column",
@@ -80,23 +80,23 @@ const LoginPage = () => {
               // fontFamily removido daqui
               // Estilos para o input branco:
               "& .MuiInputBase-input": {
-                color: "#ffffff", // Cor do texto digitado
+                color: "#c7c5b0", // Cor do texto digitado
               },
               "& .MuiInputLabel-root": {
                 color: "rgba(255, 255, 255, 0.9)", // Cor da label
               },
               "& .MuiInput-underline:before": {
-                borderBottomColor: "rgba(255, 255, 255, 0.7)", // Cor da linha
+                borderBottomColor: "#c7c5b0", // Cor da linha
               },
               "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-                borderBottomColor: "#ffffff", // Cor da linha ao passar o mouse
+                borderBottomColor: "#c7c5b0", // Cor da linha ao passar o mouse
               },
               // Cor da label e linha quando focado
               "& .MuiInput-underline:after": {
-                borderBottomColor: "#FAD4E1",
+                borderBottomColor: "#c7c5b0",
               },
               "& .MuiInputLabel-root.Mui-focused": {
-                color: "#FAD4E1",
+                color: "#c7c5b0",
               },
             }}
           />
@@ -117,23 +117,23 @@ const LoginPage = () => {
               // fontFamily removido daqui
               // Estilos para o input branco:
               "& .MuiInputBase-input": {
-                color: "#ffffff", // Cor do texto digitado
+                color: "#c7c5b0", // Cor do texto digitado
               },
               "& .MuiInputLabel-root": {
                 color: "rgba(255, 255, 255, 0.9)", // Cor da label
               },
               "& .MuiInput-underline:before": {
-                borderBottomColor: "rgba(255, 255, 255, 0.7)", // Cor da linha
+                borderBottomColor: "#c7c5b0", // Cor da linha
               },
               "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-                borderBottomColor: "#ffffff", // Cor da linha ao passar o mouse
+                borderBottomColor: "#c7c5b0", // Cor da linha ao passar o mouse
               },
               // Cor da label e linha quando focado
               "& .MuiInput-underline:after": {
-                borderBottomColor: "#FAD4E1",
+                borderBottomColor: "#c7c5b0",
               },
               "& .MuiInputLabel-root.Mui-focused": {
-                color: "#FAD4E1",
+                color: "#c7c5b0",
               },
             }}
           />
@@ -144,11 +144,11 @@ const LoginPage = () => {
             sx={{
               py: 1.5,
               fontSize: "1rem",
-              bgcolor: "#FAD4E1",
+              bgcolor: "#3f485c",
               // fontFamily removido daqui
-              color: "#000000",
+              color: "#ffffff",
               "&:hover": {
-                bgcolor: "#EF9FCF",
+                bgcolor: "#3f485c",
                 opacity: 0.9,
               },
               borderRadius: "2rem",

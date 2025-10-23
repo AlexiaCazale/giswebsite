@@ -36,13 +36,13 @@ export default function HeaderComponent() {
           <a href="#fatec-jahu">Fatec Jahu</a>
         </li>
         <li className={hover}>
-          <a href="#resultados">Resultados</a>
-        </li>
-        <li className={hover}>
           <a href="#projetos">Projetos</a>
         </li>
         <li className={hover}>
           <a href="#noticias">Notícias</a>
+        </li>
+        <li className={hover}>
+          <a href="#resultados">Resultados</a>
         </li>
         <li className={hover}>
           <a href="#membros">Membros</a>

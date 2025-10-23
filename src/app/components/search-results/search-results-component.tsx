@@ -26,7 +26,7 @@ import {
  */
 const graphMap: { [key: string]: React.ReactNode } = {
   "item-1": (
-    <div className="bg-white p-6 rounded-xl shadow-lg w-full transition-all duration-300 ease-in-out">
+    <div className="bg-white p-6 rounded-xl shadow-lg w-full h-full transition-all duration-300 ease-in-out">
       <h3 className="text-lg font-semibold mb-4 text-[#8E67A1] flex items-center">
         <DonutLargeOutlined className="mr-2" fontSize="small" />
         Gráficos - Ano 1
@@ -142,7 +142,7 @@ export default function SearchResult() {
   return (
     <React.Fragment>
       <div
-        className="flex flex-col bg-[#F9F4F4] w-screen p-[30px] py-[0px 20px] md:px-16 items-center pt-20"
+        className="flex flex-col bg-[#F9F4F4] w-screen h-screen p-[30px] py-[0px 20px] md:px-16 justify-center items-center pt-20"
         id="resultados"
       >
         {/* Título e Subtítulo - Agora no topo */}

@@ -54,7 +54,7 @@ const DashboardPage = () => {
           </div>
           <Typography
             variant="body1"
-            color="textSecondary"
+            color="white"
             className="-mt-4"
             // A prop fontFamily foi removida daqui
           >
@@ -65,8 +65,8 @@ const DashboardPage = () => {
           <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
             <Card
               sx={{
-                bgcolor: "background.paper",
-                color: "text.primary",
+                bgcolor: "#3f485c",
+                color: "white",
                 // A prop fontFamily foi removida do sx
               }}
             >
@@ -95,12 +95,12 @@ const DashboardPage = () => {
                 <Typography variant="h5" fontWeight="bold">
                   24
                 </Typography>
-                <Typography variant="caption" color="textSecondary">
+                <Typography variant="caption" color="white">
                   +20.1% desde o mês passado
                 </Typography>
               </CardContent>
             </Card>
-            <Card sx={{ bgcolor: "background.paper", color: "text.primary" }}>
+            <Card sx={{ bgcolor: "#3f485c", color: "white" }}>
               <CardHeader
                 title={
                   <Typography variant="subtitle2" fontWeight="medium">
@@ -124,12 +124,12 @@ const DashboardPage = () => {
                 <Typography variant="h5" fontWeight="bold">
                   12
                 </Typography>
-                <Typography variant="caption" color="textSecondary">
+                <Typography variant="caption" color="white">
                   +18.5% desde o mês passado
                 </Typography>
               </CardContent>
             </Card>
-            <Card sx={{ bgcolor: "background.paper", color: "text.primary" }}>
+            <Card sx={{ bgcolor: "#3f485c", color: "white" }}>
               <CardHeader
                 title={
                   <Typography variant="subtitle2" fontWeight="medium">
@@ -153,12 +153,12 @@ const DashboardPage = () => {
                 <Typography variant="h5" fontWeight="bold">
                   8
                 </Typography>
-                <Typography variant="caption" color="textSecondary">
+                <Typography variant="caption" color="white">
                   +5.2% desde o mês passado
                 </Typography>
               </CardContent>
             </Card>
-            <Card sx={{ bgcolor: "background.paper", color: "text.primary" }}>
+            <Card sx={{ bgcolor: "#3f485c", color: "white" }}>
               <CardHeader
                 title={
                   <Typography variant="subtitle2" fontWeight="medium">
@@ -182,7 +182,7 @@ const DashboardPage = () => {
                 <Typography variant="h5" fontWeight="bold">
                   4
                 </Typography>
-                <Typography variant="caption" color="textSecondary">
+                <Typography variant="caption" color="white">
                   +10.0% desde o mês passado
                 </Typography>
               </CardContent>
@@ -193,7 +193,7 @@ const DashboardPage = () => {
             {/* Quick Actions */}
             <Card
               className="xl:col-span-1"
-              sx={{ bgcolor: "background.paper", color: "text.primary" }}
+              sx={{ bgcolor: "#3f485c", color: "white" }}
             >
               <CardHeader
                 title={<Typography variant="h6">Ações Rápidas</Typography>}
@@ -201,14 +201,14 @@ const DashboardPage = () => {
               <CardContent className="grid gap-4">
                 <Link
                   href="/admin/members"
-                  className="flex items-center gap-4 p-3 rounded-md hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-4 p-3 rounded-md hover:bg-[#2d303f] transition-colors"
                 >
                   <UsersIcon sx={{ color: "hsl(var(--vibrant-blue))" }} />
                   <div>
                     <Typography variant="subtitle1" fontWeight="medium">
                       Gerenciar Membros
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" color="white">
                       Ver todos os membros
                     </Typography>
                   </div>
@@ -219,7 +219,7 @@ const DashboardPage = () => {
                 </Link>
                 <Link
                   href="/admin/projects"
-                  className="flex items-center gap-4 p-3 rounded-md hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-4 p-3 rounded-md hover:bg-[#2d303f] transition-colors"
                 >
                   <FolderKanbanIcon
                     sx={{ color: "hsl(var(--vibrant-orange))" }}
@@ -228,7 +228,7 @@ const DashboardPage = () => {
                     <Typography variant="subtitle1" fontWeight="medium">
                       Gerenciar Projetos
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" color="white">
                       Ver todos os projetos
                     </Typography>
                   </div>
@@ -239,14 +239,14 @@ const DashboardPage = () => {
                 </Link>
                 <Link
                   href="/admin/news"
-                  className="flex items-center gap-4 p-3 rounded-md hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-4 p-3 rounded-md hover:bg-[#2d303f] transition-colors"
                 >
                   <NewspaperIcon sx={{ color: "hsl(var(--vibrant-green))" }} />
                   <div>
                     <Typography variant="subtitle1" fontWeight="medium">
                       Gerenciar Notícias
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" color="white">
                       Ver todas as notícias
                     </Typography>
                   </div>
@@ -259,7 +259,7 @@ const DashboardPage = () => {
             </Card>
 
             {/* Recent Members */}
-            <Card sx={{ bgcolor: "background.paper", color: "text.primary" }}>
+            <Card sx={{ bgcolor: "#3f485c", color: "white" }}>
               <CardHeader
                 title={<Typography variant="h6">Membros Recentes</Typography>}
                 action={
@@ -284,7 +284,7 @@ const DashboardPage = () => {
                     >
                       Ana Silva
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" color="white">
                       Desenvolvedora
                     </Typography>
                   </div>
@@ -299,7 +299,7 @@ const DashboardPage = () => {
                     >
                       Maria Santos
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" color="white">
                       Designer
                     </Typography>
                   </div>
@@ -314,7 +314,7 @@ const DashboardPage = () => {
                     >
                       Julia Costa
                     </Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" color="white">
                       Engenheira
                     </Typography>
                   </div>
@@ -323,7 +323,7 @@ const DashboardPage = () => {
             </Card>
 
             {/* Recent Projects */}
-            <Card sx={{ bgcolor: "background.paper", color: "text.primary" }}>
+            <Card sx={{ bgcolor: "#3f485c", color: "white" }}>
               <CardHeader
                 title={<Typography variant="h6">Projetos Recentes</Typography>}
                 action={
@@ -363,7 +363,7 @@ const DashboardPage = () => {
                       },
                     }}
                   />
-                  <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="white">
                     75% completo
                   </Typography>
                 </div>
@@ -392,7 +392,7 @@ const DashboardPage = () => {
                       },
                     }}
                   />
-                  <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="white">
                     45% completo
                   </Typography>
                 </div>
@@ -421,7 +421,7 @@ const DashboardPage = () => {
                       },
                     }}
                   />
-                  <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="white">
                     100% completo
                   </Typography>
                 </div>

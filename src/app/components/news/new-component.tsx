@@ -3,23 +3,41 @@
 import * as React from "react"; // Esta é a linha corrigida
 import Image from "next/image";
 import Link from "next/link"; // Importe o Link
+import SlideComponentNews from "./slider-news-component";
 
 // Dados Fictícios (Mock)
-const mockNewsData = [
+// new-component.jsx - Exemplo com mais dados
+
+export const mockNewsData = [
   {
     id: "1",
-    imageSrc: "/images/noticia-ciencia.jpg",
+    imgUrl: "/news/mulheresnaciencia.png",
+    alt: "Mulheres na Ciência",
     linkUrl: "/noticias/mulheres-na-ciencia",
   },
   {
     id: "2",
-    imageSrc: "/images/noticia-etecs.jpg",
+    imgUrl: "/news/Mulheres-Cientistas.png",
+    alt: "ETECs e FATECs",
     linkUrl: "/noticias/etecs-e-fatecs",
   },
   {
     id: "3",
-    imageSrc: "/images/noticia-tomates.jpg",
+    imgUrl: "/news/tomates.png",
+    alt: "Professores FATEC Jahu",
     linkUrl: "/noticias/professores-fatec-jahu",
+  },
+  {
+    id: "4", // NOVO
+    imgUrl: "/news/noticia-exemplo-4.jpg",
+    alt: "Exemplo Notícia 4",
+    linkUrl: "/noticias/exemplo-4",
+  },
+  {
+    id: "5", // NOVO
+    imgUrl: "/news/noticia-exemplo-5.jpg",
+    alt: "Exemplo Notícia 5",
+    linkUrl: "/noticias/exemplo-5",
   },
 ];
 
@@ -27,44 +45,19 @@ export default function NewsPage() {
   return (
     <React.Fragment>
       <div
-        className="flex flex-col bg-[#FDF9FA] min-h-screen w-full p-8 md:p-16 items-center"
+        className="relative flex flex-col min-h-screen w-full p-8 md:p-16 justify-center items-center bg-[#3f485c]"
         id="noticias"
       >
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900">Notícias</h1>
-          <p className="text-center md:text-start">Saiba onde foi nossa última aparição.</p>
+        <div className="absolute inset-0 bg-black/20 z-0" />
+
+        <div className="flex flex-col relative text-center mb-12 gap-2">
+          <h1 className="text-4xl font-bold text-white">Notícias</h1>
+          <p className="text-center text-white md:text-start">Saiba onde foi nossa última aparição.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
-          {mockNewsData.map((news) => (
-            <div
-              key={news.id}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200/80 flex flex-col"
-            >
-              <div className="relative w-full aspect-[4/3]">
-                <Image
-                  src={news.imageSrc}
-                  alt={`Notícia ${news.id}`}
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </div>
 
-              <div className="p-6 flex justify-center mt-auto">
-                <Link
-                  href={news.linkUrl}
-                  className="
-                    py-2 px-10 rounded-lg text-white font-semibold 
-                    bg-gradient-to-r from-[#D6438F] to-[#8E67A1] 
-                    shadow-md transition-all hover:opacity-90
-                  "
-                >
-                  ACESSAR
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+        <SlideComponentNews />
+
       </div>
     </React.Fragment>
   );

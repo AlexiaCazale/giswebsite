@@ -46,20 +46,22 @@ function SlideComponentProjects() {
     <div className="slider-container">
       <Slider {...settings}>
         {dataProjects.map((e) => (
-          <div key={e.id} className="px-2">
-            <Link href={`/projeto/${e.id}`}>
-              <div className="flex flex-col items-center p-1">
-                <Image
-                  src={e.imgUrl}
-                  alt={e.alt || e.name || "Projeto"}
-                  width={250}
-                  height={250}
-                  className="rounded-[8px] flex object-cover"
-                  priority
-                />
-                <p className="mt-2 font-bold">{e.name}</p>
-              </div>
-            </Link>
+          <div key={e.id}>
+            <div
+              className=" shadow-lg flex flex-col h-full mx-4"
+            >
+              <Link href={`/projeto/${e.id}`}>
+                <div className="relative w-full aspect-[3/4] ">
+                  <Image
+                    src={e.imgUrl}
+                    alt={e.alt || e.name || "Projeto"}
+                    layout="fill"
+                    objectFit="cover" 
+                    className="rounded-2xl" />
+                </div>
+                  <p className="mt-2 text-center font-bold">{e.name}</p>
+              </Link>
+            </div>
           </div>
         ))}
       </Slider>

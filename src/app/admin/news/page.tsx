@@ -35,11 +35,76 @@ import {
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
 
-// 2. Crie um tema local que define a fonte padrão
+// 2. Crie um tema local que define a fonte e as cores para o modo escuro, seguindo o padrão
 const muiTheme = createTheme({
   typography: {
     fontFamily: '"Montserrat", sans-serif',
   },
+  palette: {
+    mode: "dark", // Modo escuro ativado
+    background: {
+      default: "#181c2c", // Fundo geral (do layout)
+      paper: "#2d303f", // Fundo de Cards, Modals, etc.
+    },
+    error: {
+      main: "#ff6b6b", // Vermelho de erro
+    },
+    text: {
+      primary: "#ffffff",
+      secondary: "#b0b0b0",
+    },
+  },
+  components: {
+    // Estilos para harmonizar os inputs com o tema escuro
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          color: '#ffffff',
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.5)',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.7)',
+          },
+        },
+      },
+    },
+    MuiInputLabel: {
+        styleOverrides: {
+            root: {
+                color: 'rgba(255, 255, 255, 0.7)',
+                '&.Mui-focused': {
+                    color: 'rgba(255, 255, 255, 0.9)',
+                }
+            }
+        }
+    },
+    // Estilos para harmonizar a tabela
+    MuiTableCell: {
+        styleOverrides: {
+            root: {
+                color: '#ffffff',
+                borderColor: '#2d303f',
+            },
+            head: {
+                backgroundColor: '#2d303f',
+                color: '#ffffff',
+            }
+        }
+    },
+    // Estilos para harmonizar o diálogo
+    MuiDialog: {
+        styleOverrides: {
+            paper: {
+                backgroundColor: '#2d303f',
+                color: '#ffffff',
+            }
+        }
+    }
+  }
 });
 
 const NewsPage = () => {
@@ -111,13 +176,28 @@ const NewsPage = () => {
               setNewNewsData({ title: "", author: "", publishDate: "", content: "" });
               setIsDialogOpen(true);
             }}
+            // MUDANÇA: Estilo do botão para neutro/escuro
+            sx={{
+                bgcolor: '#3f485c', // Cor de fundo neutra
+                color: 'white',
+                '&:hover': {
+                    bgcolor: '#4f5a70', // Cor um pouco mais clara no hover
+                },
+            }}
           >
             Adicionar Notícia
           </Button>
-          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-            <DialogTitle>{editingNews ? "Editar Notícia" : "Adicionar Nova Notícia"}</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
+
+          {/* MUDANÇA: Dialog ajustado para tema escuro */}
+          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} 
+            PaperProps={{ sx: { bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary } }}>
+            
+            <DialogTitle sx={{ backgroundColor: muiTheme.palette.background.default, color: muiTheme.palette.text.primary }}>
+                {editingNews ? "Editar Notícia" : "Adicionar Nova Notícia"}
+            </DialogTitle>
+            
+            <DialogContent sx={{backgroundColor: muiTheme.palette.background.paper}}>
+              <DialogContentText color={muiTheme.palette.text.secondary}>
                 Preencha os detalhes da notícia aqui. Clique em salvar quando terminar.
               </DialogContentText>
               <TextField
@@ -168,23 +248,45 @@ const NewsPage = () => {
                 sx={{ mt: 2 }}
               />
             </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={handleAddNews} variant="contained">
+            
+            <DialogActions sx={{ backgroundColor: muiTheme.palette.background.paper }}>
+              <Button onClick={() => setIsDialogOpen(false)} color="inherit">Cancelar</Button>
+              <Button 
+                onClick={handleAddNews} 
+                variant="contained"
+                // MUDANÇA: Estilo do botão para neutro/escuro
+                sx={{
+                    bgcolor: '#3f485c', // Cor de fundo neutra
+                    color: 'white',
+                    '&:hover': {
+                        bgcolor: '#4f5a70', // Cor um pouco mais clara no hover
+                    },
+                }}
+              >
                 {editingNews ? "Salvar Alterações" : "Adicionar Notícia"}
               </Button>
             </DialogActions>
           </Dialog>
         </div>
-        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-          <CardHeader title={<Typography variant="h6">Lista de Notícias</Typography>} />
+        
+        {/* MUDANÇA: Card e Tabela ajustados para tema escuro */}
+        <Card sx={{ bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary }}>
+          <CardHeader title={<Typography variant="h6" color="white">Lista de Notícias</Typography>} />
           <CardContent>
             {news.length === 0 ? (
-              <Typography color="textSecondary">
+              <Typography color="white">
                 Nenhuma notícia encontrada.
               </Typography>
             ) : (
-              <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+              <TableContainer 
+                component={Paper} 
+                sx={{ 
+                    backgroundColor: muiTheme.palette.background.paper, 
+                    color: muiTheme.palette.text.primary, 
+                    boxShadow: 'none',
+                    border: '1px solid #3f485c', // Borda sutil
+                }}
+              >
                 <Table>
                   <TableHead>
                     <TableRow>
@@ -196,7 +298,7 @@ const NewsPage = () => {
                   </TableHead>
                   <TableBody>
                     {news.map((newsItem) => (
-                      <TableRow key={newsItem.id}>
+                      <TableRow key={newsItem.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell component="th" scope="row">
                           {newsItem.title}
                         </TableCell>
@@ -207,7 +309,7 @@ const NewsPage = () => {
                             variant="text"
                             size="small"
                             onClick={() => handleEditClick(newsItem)}
-                            sx={{ minWidth: 'auto', p: 1 }}
+                            sx={{ minWidth: 'auto', p: 1, color: muiTheme.palette.text.secondary }} // Ícone de Edição discreto
                           >
                             <EditIcon fontSize="small" />
                           </Button>
@@ -215,6 +317,7 @@ const NewsPage = () => {
                             variant="text"
                             size="small"
                             onClick={() => confirmDelete(newsItem.id)}
+                            color="error" // Cor de erro (vermelho) para o ícone de exclusão
                             sx={{ minWidth: 'auto', p: 1, ml: 1 }}
                           >
                             <Trash2Icon fontSize="small" />
@@ -222,17 +325,18 @@ const NewsPage = () => {
                           <Dialog
                             open={isConfirmDialogOpen && newsToDeleteId === newsItem.id}
                             onClose={() => setIsConfirmDialogOpen(false)}
+                            PaperProps={{ sx: { bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary } }}
                             aria-labelledby="alert-dialog-title"
                             aria-describedby="alert-dialog-description"
                           >
-                            <DialogTitle id="alert-dialog-title">{"Tem certeza?"}</DialogTitle>
-                            <DialogContent>
-                              <DialogContentText id="alert-dialog-description">
+                            <DialogTitle id="alert-dialog-title" sx={{ backgroundColor: muiTheme.palette.background.default, color: muiTheme.palette.text.primary }}>{"Tem certeza?"}</DialogTitle>
+                            <DialogContent sx={{backgroundColor: muiTheme.palette.background.paper}}>
+                              <DialogContentText id="alert-dialog-description" color={muiTheme.palette.text.secondary}>
                                 Esta ação não pode ser desfeita. Isso excluirá permanentemente a notícia.
                               </DialogContentText>
                             </DialogContent>
-                            <DialogActions>
-                              <Button onClick={() => setIsConfirmDialogOpen(false)}>Cancelar</Button>
+                            <DialogActions sx={{ backgroundColor: muiTheme.palette.background.paper }}>
+                              <Button onClick={() => setIsConfirmDialogOpen(false)} color="inherit">Cancelar</Button>
                               <Button onClick={handleDeleteConfirmed} autoFocus variant="contained" color="error">
                                 Continuar
                               </Button>

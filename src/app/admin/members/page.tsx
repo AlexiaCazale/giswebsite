@@ -37,11 +37,76 @@ import {
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
 
-// 2. Crie um tema local que define a fonte padrão
+// 2. Crie um tema local que define a fonte e as cores para o modo escuro, seguindo o padrão
 const muiTheme = createTheme({
   typography: {
     fontFamily: '"Montserrat", sans-serif',
   },
+  palette: {
+    mode: "dark", // Modo escuro ativado
+    background: {
+      default: "#181c2c", // Fundo geral (do layout)
+      paper: "#2d303f", // Fundo de Cards, Modals, etc.
+    },
+    error: {
+      main: "#ff6b6b", // Vermelho de erro
+    },
+    text: {
+      primary: "#ffffff",
+      secondary: "#b0b0b0",
+    },
+  },
+  components: {
+    // Estilos para harmonizar os inputs com o tema escuro
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          color: '#ffffff',
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.5)',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.7)',
+          },
+        },
+      },
+    },
+    MuiInputLabel: {
+        styleOverrides: {
+            root: {
+                color: 'rgba(255, 255, 255, 0.7)',
+                '&.Mui-focused': {
+                    color: 'rgba(255, 255, 255, 0.9)',
+                }
+            }
+        }
+    },
+    // Estilos para harmonizar a tabela
+    MuiTableCell: {
+        styleOverrides: {
+            root: {
+                color: '#ffffff',
+                borderColor: '#2d303f',
+            },
+            head: {
+                backgroundColor: '#2d303f',
+                color: '#ffffff',
+            }
+        }
+    },
+    // Estilos para harmonizar o diálogo
+    MuiDialog: {
+        styleOverrides: {
+            paper: {
+                backgroundColor: '#2d303f',
+                color: '#ffffff',
+            }
+        }
+    }
+  }
 });
 
 const MembersPage = () => {
@@ -113,13 +178,28 @@ const MembersPage = () => {
               setNewMemberData({ name: "", role: "", email: "", joinedDate: "" });
               setIsDialogOpen(true);
             }}
+            // MUDANÇA: Estilo do botão para neutro/escuro
+            sx={{
+                bgcolor: '#3f485c', // Cor de fundo neutra
+                color: 'white',
+                '&:hover': {
+                    bgcolor: '#4f5a70', // Cor um pouco mais clara no hover
+                },
+            }}
           >
             Adicionar Membro
           </Button>
-          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-            <DialogTitle>{editingMember ? "Editar Membro" : "Adicionar Novo Membro"}</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
+
+          {/* MUDANÇA: Dialog ajustado para tema escuro */}
+          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}
+            PaperProps={{ sx: { bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary } }}>
+            
+            <DialogTitle sx={{ backgroundColor: muiTheme.palette.background.default, color: muiTheme.palette.text.primary }}>
+                {editingMember ? "Editar Membro" : "Adicionar Novo Membro"}
+            </DialogTitle>
+            
+            <DialogContent sx={{backgroundColor: muiTheme.palette.background.paper}}>
+              <DialogContentText color={muiTheme.palette.text.secondary}>
                 Preencha os detalhes do membro aqui. Clique em salvar quando terminar.
               </DialogContentText>
               <TextField
@@ -169,23 +249,45 @@ const MembersPage = () => {
                 sx={{ mt: 2 }}
               />
             </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setIsDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={handleAddMember} variant="contained">
+            
+            <DialogActions sx={{ backgroundColor: muiTheme.palette.background.paper }}>
+              <Button onClick={() => setIsDialogOpen(false)} color="inherit">Cancelar</Button>
+              <Button 
+                onClick={handleAddMember} 
+                variant="contained"
+                // MUDANÇA: Estilo do botão para neutro/escuro
+                sx={{
+                    bgcolor: '#3f485c', // Cor de fundo neutra
+                    color: 'white',
+                    '&:hover': {
+                        bgcolor: '#4f5a70', // Cor um pouco mais clara no hover
+                    },
+                }}
+              >
                 {editingMember ? "Salvar Alterações" : "Adicionar Membro"}
               </Button>
             </DialogActions>
           </Dialog>
         </div>
-        <Card sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
-          <CardHeader title={<Typography variant="h6">Lista de Membros</Typography>} />
+        
+        {/* MUDANÇA: Card e Tabela ajustados para tema escuro */}
+        <Card sx={{ bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary }}>
+          <CardHeader title={<Typography variant="h6" color="white">Lista de Membros</Typography>} />
           <CardContent>
             {members.length === 0 ? (
-              <Typography color="textSecondary">
+              <Typography color="white">
                 Nenhum membro encontrado.
               </Typography>
             ) : (
-              <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+              <TableContainer 
+                component={Paper} 
+                sx={{ 
+                    backgroundColor: muiTheme.palette.background.paper, 
+                    color: muiTheme.palette.text.primary, 
+                    boxShadow: 'none',
+                    border: '1px solid #3f485c', // Borda sutil
+                }}
+              >
                 <Table>
                   <TableHead>
                     <TableRow>
@@ -198,7 +300,7 @@ const MembersPage = () => {
                   </TableHead>
                   <TableBody>
                     {members.map((member) => (
-                      <TableRow key={member.id}>
+                      <TableRow key={member.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell component="th" scope="row">
                           {member.name}
                         </TableCell>
@@ -210,7 +312,7 @@ const MembersPage = () => {
                             variant="text"
                             size="small"
                             onClick={() => handleEditClick(member)}
-                            sx={{ minWidth: 'auto', p: 1 }}
+                            sx={{ minWidth: 'auto', p: 1, color: muiTheme.palette.text.secondary }} // Ícone de Edição discreto
                           >
                             <EditIcon fontSize="small" />
                           </Button>
@@ -218,6 +320,7 @@ const MembersPage = () => {
                             variant="text"
                             size="small"
                             onClick={() => confirmDelete(member.id)}
+                            color="error" // Cor de erro (vermelho) para o ícone de exclusão
                             sx={{ minWidth: 'auto', p: 1, ml: 1 }}
                           >
                             <Trash2Icon fontSize="small" />
@@ -225,17 +328,18 @@ const MembersPage = () => {
                           <Dialog
                             open={isConfirmDialogOpen && memberToDeleteId === member.id}
                             onClose={() => setIsConfirmDialogOpen(false)}
+                            PaperProps={{ sx: { bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary } }}
                             aria-labelledby="alert-dialog-title"
                             aria-describedby="alert-dialog-description"
                           >
-                            <DialogTitle id="alert-dialog-title">{"Tem certeza?"}</DialogTitle>
-                            <DialogContent>
-                              <DialogContentText id="alert-dialog-description">
+                            <DialogTitle id="alert-dialog-title" sx={{ backgroundColor: muiTheme.palette.background.default, color: muiTheme.palette.text.primary }}>{"Tem certeza?"}</DialogTitle>
+                            <DialogContent sx={{backgroundColor: muiTheme.palette.background.paper}}>
+                              <DialogContentText id="alert-dialog-description" color={muiTheme.palette.text.secondary}>
                                 Esta ação não pode ser desfeita. Isso excluirá permanentemente o membro.
                               </DialogContentText>
                             </DialogContent>
-                            <DialogActions>
-                              <Button onClick={() => setIsConfirmDialogOpen(false)}>Cancelar</Button>
+                            <DialogActions sx={{ backgroundColor: muiTheme.palette.background.paper }}>
+                              <Button onClick={() => setIsConfirmDialogOpen(false)} color="inherit">Cancelar</Button>
                               <Button onClick={handleDeleteConfirmed} autoFocus variant="contained" color="error">
                                 Continuar
                               </Button>
