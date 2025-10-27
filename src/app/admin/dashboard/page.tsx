@@ -15,6 +15,7 @@ import {
   ArrowOutward as ArrowUpRightIcon,
 } from "@mui/icons-material";
 import Link from "next/link";
+// Importação de layout e provedor de tema
 import AdminLayout from "@/app/components/admin/AdminLayout";
 import { ThemeProvider } from "@/app/components/ui/theme-provider";
 
@@ -24,11 +25,30 @@ import {
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
 
+// Definição manual das cores para manter a estética do tema escuro suave (match AdminLayout)
+const BACKGROUND_PAPER = "#3f485c"; // Fundo de Cards (match AdminLayout: BACKGROUND_PAPER)
+const TEXT_PRIMARY = "#ffffffff"; // Cor do texto principal (match AdminLayout: TEXT_PRIMARY)
+const TEXT_SECONDARY = "#bebebeff"; // Cor do texto secundário
+const HOVER_BG = "#344054"; // Fundo do hover para uso no Tailwind (match AdminLayout: HOVER_BG)
+const PRIMARY_MAIN = "#da9bba"; // Verde (match AdminLayout: PRIMARY_MAIN)
+
+
 // 2. Crie um tema local que define a fonte padrão
 const muiTheme = createTheme({
   typography: {
     fontFamily: '"Montserrat", sans-serif',
   },
+  palette: {
+    // Definir as cores no palette ajuda a tipografia MUI
+    mode: 'dark',
+    primary: {
+        main: PRIMARY_MAIN,
+    },
+    text: {
+        primary: TEXT_PRIMARY,
+        secondary: TEXT_SECONDARY,
+    }
+  }
 });
 
 const DashboardPage = () => {
@@ -47,16 +67,17 @@ const DashboardPage = () => {
               variant="h4"
               component="h1"
               fontWeight="bold"
-              // A prop fontFamily foi removida daqui
+              // Usando a cor de texto do tema
+              color="text.primary" 
             >
               Dashboard
             </Typography>
           </div>
           <Typography
             variant="body1"
-            color="white"
+            // Usando a cor de texto do tema
+            color="text.primary" 
             className="-mt-4"
-            // A prop fontFamily foi removida daqui
           >
             Bem-vindo ao painel administrativo do Girls in STEM
           </Typography>
@@ -65,9 +86,9 @@ const DashboardPage = () => {
           <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
             <Card
               sx={{
-                bgcolor: "#3f485c",
-                color: "white",
-                // A prop fontFamily foi removida do sx
+                // Corrigido para o novo azul escuro suave
+                bgcolor: BACKGROUND_PAPER,
+                color: TEXT_PRIMARY,
               }}
             >
               <CardHeader
@@ -75,7 +96,6 @@ const DashboardPage = () => {
                   <Typography
                     variant="subtitle2"
                     fontWeight="medium"
-                    // A prop fontFamily foi removida daqui
                   >
                     Total de Membros
                   </Typography>
@@ -95,12 +115,13 @@ const DashboardPage = () => {
                 <Typography variant="h5" fontWeight="bold">
                   24
                 </Typography>
-                <Typography variant="caption" color="white">
+                {/* Corrigido para a nova cor de texto */}
+                <Typography variant="caption" color="text.secondary"> 
                   +20.1% desde o mês passado
                 </Typography>
               </CardContent>
             </Card>
-            <Card sx={{ bgcolor: "#3f485c", color: "white" }}>
+            <Card sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}>
               <CardHeader
                 title={
                   <Typography variant="subtitle2" fontWeight="medium">
@@ -124,12 +145,13 @@ const DashboardPage = () => {
                 <Typography variant="h5" fontWeight="bold">
                   12
                 </Typography>
-                <Typography variant="caption" color="white">
+                {/* Corrigido para a nova cor de texto */}
+                <Typography variant="caption" color="text.secondary"> 
                   +18.5% desde o mês passado
                 </Typography>
               </CardContent>
             </Card>
-            <Card sx={{ bgcolor: "#3f485c", color: "white" }}>
+            <Card sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}>
               <CardHeader
                 title={
                   <Typography variant="subtitle2" fontWeight="medium">
@@ -153,12 +175,13 @@ const DashboardPage = () => {
                 <Typography variant="h5" fontWeight="bold">
                   8
                 </Typography>
-                <Typography variant="caption" color="white">
+                {/* Corrigido para a nova cor de texto */}
+                <Typography variant="caption" color="text.secondary">
                   +5.2% desde o mês passado
                 </Typography>
               </CardContent>
             </Card>
-            <Card sx={{ bgcolor: "#3f485c", color: "white" }}>
+            <Card sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}>
               <CardHeader
                 title={
                   <Typography variant="subtitle2" fontWeight="medium">
@@ -182,7 +205,8 @@ const DashboardPage = () => {
                 <Typography variant="h5" fontWeight="bold">
                   4
                 </Typography>
-                <Typography variant="caption" color="white">
+                {/* Corrigido para a nova cor de texto */}
+                <Typography variant="caption" color="text.secondary">
                   +10.0% desde o mês passado
                 </Typography>
               </CardContent>
@@ -193,7 +217,8 @@ const DashboardPage = () => {
             {/* Quick Actions */}
             <Card
               className="xl:col-span-1"
-              sx={{ bgcolor: "#3f485c", color: "white" }}
+              // Corrigido para o novo azul escuro suave
+              sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}
             >
               <CardHeader
                 title={<Typography variant="h6">Ações Rápidas</Typography>}
@@ -201,14 +226,16 @@ const DashboardPage = () => {
               <CardContent className="grid gap-4">
                 <Link
                   href="/admin/members"
-                  className="flex items-center gap-4 p-3 rounded-md hover:bg-[#2d303f] transition-colors"
+                  // Corrigido para o novo hover suave
+                  className={`flex items-center gap-4 p-3 rounded-md hover:bg-[${HOVER_BG}] transition-colors`}
                 >
                   <UsersIcon sx={{ color: "hsl(var(--vibrant-blue))" }} />
                   <div>
                     <Typography variant="subtitle1" fontWeight="medium">
                       Gerenciar Membros
                     </Typography>
-                    <Typography variant="body2" color="white">
+                    {/* Corrigido para a nova cor de texto secundário */}
+                    <Typography variant="body2" color="text.secondary">
                       Ver todos os membros
                     </Typography>
                   </div>
@@ -219,7 +246,8 @@ const DashboardPage = () => {
                 </Link>
                 <Link
                   href="/admin/projects"
-                  className="flex items-center gap-4 p-3 rounded-md hover:bg-[#2d303f] transition-colors"
+                  // Corrigido para o novo hover suave
+                  className={`flex items-center gap-4 p-3 rounded-md hover:bg-[${HOVER_BG}] transition-colors`}
                 >
                   <FolderKanbanIcon
                     sx={{ color: "hsl(var(--vibrant-orange))" }}
@@ -228,7 +256,8 @@ const DashboardPage = () => {
                     <Typography variant="subtitle1" fontWeight="medium">
                       Gerenciar Projetos
                     </Typography>
-                    <Typography variant="body2" color="white">
+                    {/* Corrigido para a nova cor de texto secundário */}
+                    <Typography variant="body2" color="text.secondary">
                       Ver todos os projetos
                     </Typography>
                   </div>
@@ -239,14 +268,16 @@ const DashboardPage = () => {
                 </Link>
                 <Link
                   href="/admin/news"
-                  className="flex items-center gap-4 p-3 rounded-md hover:bg-[#2d303f] transition-colors"
+                  // Corrigido para o novo hover suave
+                  className={`flex items-center gap-4 p-3 rounded-md hover:bg-[${HOVER_BG}] transition-colors`}
                 >
                   <NewspaperIcon sx={{ color: "hsl(var(--vibrant-green))" }} />
                   <div>
                     <Typography variant="subtitle1" fontWeight="medium">
                       Gerenciar Notícias
                     </Typography>
-                    <Typography variant="body2" color="white">
+                    {/* Corrigido para a nova cor de texto secundário */}
+                    <Typography variant="body2" color="text.secondary">
                       Ver todas as notícias
                     </Typography>
                   </div>
@@ -259,7 +290,7 @@ const DashboardPage = () => {
             </Card>
 
             {/* Recent Members */}
-            <Card sx={{ bgcolor: "#3f485c", color: "white" }}>
+            <Card sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}>
               <CardHeader
                 title={<Typography variant="h6">Membros Recentes</Typography>}
                 action={
@@ -267,7 +298,8 @@ const DashboardPage = () => {
                     component={Link}
                     href="/admin/members"
                     size="small"
-                    sx={{ color: "hsl(var(--admin-active-bg))" }}
+                    // Corrigido para a cor primária verde
+                    sx={{ color: PRIMARY_MAIN }} 
                   >
                     Ver todos
                   </Button>
@@ -275,7 +307,7 @@ const DashboardPage = () => {
               />
               <CardContent className="grid gap-6">
                 <div className="flex items-center gap-4">
-                  <Avatar sx={{ width: 36, height: 36 }}>AS</Avatar>
+                  <Avatar sx={{ width: 36, height: 36, bgcolor: PRIMARY_MAIN, color: BACKGROUND_PAPER }}>AS</Avatar>
                   <div className="grid gap-1">
                     <Typography
                       variant="subtitle2"
@@ -284,13 +316,14 @@ const DashboardPage = () => {
                     >
                       Ana Silva
                     </Typography>
-                    <Typography variant="body2" color="white">
+                    {/* Corrigido para a nova cor de texto secundário */}
+                    <Typography variant="body2" color="text.secondary">
                       Desenvolvedora
                     </Typography>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Avatar sx={{ width: 36, height: 36 }}>MS</Avatar>
+                  <Avatar sx={{ width: 36, height: 36, bgcolor: PRIMARY_MAIN, color: BACKGROUND_PAPER }}>MS</Avatar>
                   <div className="grid gap-1">
                     <Typography
                       variant="subtitle2"
@@ -299,13 +332,14 @@ const DashboardPage = () => {
                     >
                       Maria Santos
                     </Typography>
-                    <Typography variant="body2" color="white">
+                    {/* Corrigido para a nova cor de texto secundário */}
+                    <Typography variant="body2" color="text.secondary">
                       Designer
                     </Typography>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Avatar sx={{ width: 36, height: 36 }}>JC</Avatar>
+                  <Avatar sx={{ width: 36, height: 36, bgcolor: PRIMARY_MAIN, color: BACKGROUND_PAPER }}>JC</Avatar>
                   <div className="grid gap-1">
                     <Typography
                       variant="subtitle2"
@@ -314,7 +348,8 @@ const DashboardPage = () => {
                     >
                       Julia Costa
                     </Typography>
-                    <Typography variant="body2" color="white">
+                    {/* Corrigido para a nova cor de texto secundário */}
+                    <Typography variant="body2" color="text.secondary">
                       Engenheira
                     </Typography>
                   </div>
@@ -323,7 +358,7 @@ const DashboardPage = () => {
             </Card>
 
             {/* Recent Projects */}
-            <Card sx={{ bgcolor: "#3f485c", color: "white" }}>
+            <Card sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}>
               <CardHeader
                 title={<Typography variant="h6">Projetos Recentes</Typography>}
                 action={
@@ -331,7 +366,8 @@ const DashboardPage = () => {
                     component={Link}
                     href="/admin/projects"
                     size="small"
-                    sx={{ color: "hsl(var(--admin-active-bg))" }}
+                    // Corrigido para a cor primária verde
+                    sx={{ color: PRIMARY_MAIN }}
                   >
                     Ver todos
                   </Button>
@@ -363,7 +399,8 @@ const DashboardPage = () => {
                       },
                     }}
                   />
-                  <Typography variant="body2" color="white">
+                  {/* Corrigido para a nova cor de texto secundário */}
+                  <Typography variant="body2" color="text.secondary">
                     75% completo
                   </Typography>
                 </div>
@@ -392,7 +429,8 @@ const DashboardPage = () => {
                       },
                     }}
                   />
-                  <Typography variant="body2" color="white">
+                  {/* Corrigido para a nova cor de texto secundário */}
+                  <Typography variant="body2" color="text.secondary">
                     45% completo
                   </Typography>
                 </div>
@@ -421,7 +459,8 @@ const DashboardPage = () => {
                       },
                     }}
                   />
-                  <Typography variant="body2" color="white">
+                  {/* Corrigido para a nova cor de texto secundário */}
+                  <Typography variant="body2" color="text.secondary">
                     100% completo
                   </Typography>
                 </div>

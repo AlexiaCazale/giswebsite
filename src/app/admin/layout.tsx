@@ -39,24 +39,33 @@ import { ThemeProvider as NextThemesProvider } from "../components/ui/theme-prov
 
 const drawerWidth = 240;
 
-// 2. Crie seu tema MUI global aqui
-// Adicionado palette para definir o fundo e a cor padrão do texto.
+// Definição das cores para TEMA ESCURO MAIS CLARO/SUAVE (Manual)
+const BACKGROUND_DEFAULT = "#2b2f3d"; // Um azul escuro mais suave para o fundo principal
+const BACKGROUND_PAPER = "#2b2f3d"; // Um azul escuro ligeiramente mais escuro para Drawer/AppBar
+const TEXT_PRIMARY = "#e0e0e0"; // Texto principal (branco/cinza muito claro)
+const TEXT_SECONDARY = "#a0a0a0"; // Texto secundário/Ícones normais (cinza médio)
+const PRIMARY_MAIN = "#ffffffff"; // Um verde mais vibrante para a cor primária
+const SELECTED_BG = "#1e202aff"; // Fundo do item selecionado no Drawer (azul escuro um pouco mais claro)
+const HOVER_BG = "#1e202aff"; // Fundo do item em hover no Drawer (azul escuro)
+const BORDER_COLOR = "#3c485c"; // Cor da borda/divisor (azul acinzentado)
+
+// 2. Crie seu tema MUI global aqui - TEMA ESCURO MAIS SUAVE 🎨
 const muiTheme = createTheme({
   typography: {
     fontFamily: '"Montserrat", sans-serif',
   },
   palette: {
-    mode: "dark", // Isso configura o MUI para um tema escuro
+    mode: "dark", // Mantemos "dark" para componentes MUI internos
     background: {
-      default: "#181c2c",
-      paper: "#181c2c",
+      default: BACKGROUND_DEFAULT,
+      paper: BACKGROUND_PAPER,
     },
     primary: {
-      main: "#4caf50", // Exemplo de cor primária
+      main: PRIMARY_MAIN,
     },
     text: {
-      primary: "#ffffff",
-      secondary: "#b0b0b0",
+      primary: TEXT_PRIMARY,
+      secondary: TEXT_SECONDARY,
     },
   },
 });
@@ -117,7 +126,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   // 3. Use os provedores reais em vez do wrapper
   if (isLoading) {
     return (
-      <NextThemesProvider forcedTheme="light" attribute="class">
+      <NextThemesProvider forcedTheme="dark" attribute="class"> {/* Força tema escuro no loading */}
         <MuiThemeProvider theme={muiTheme}>
           <div
             style={{
@@ -125,8 +134,9 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               justifyContent: "center",
               alignItems: "center",
               height: "100vh",
-              backgroundColor: "#181c2c", // 👈 Adicionado background na tela de loading
-              color: "white",
+              // Usando o novo background suave
+              backgroundColor: BACKGROUND_DEFAULT,
+              color: TEXT_PRIMARY,
             }}
           >
             <p>Verificando autenticação...</p>
@@ -138,10 +148,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   if (isLoginPage) {
     return (
-      <NextThemesProvider forcedTheme="light" attribute="class">
+      <NextThemesProvider forcedTheme="dark" attribute="class"> {/* Força tema escuro no login */}
         <MuiThemeProvider theme={muiTheme}>
-          {/* Adicionado background na Box/div que envolve a tela de login */}
-          <Box sx={{ minHeight: '100vh', bgcolor: '#181c2c', color: 'white' }}>
+          {/* Usando o novo background suave */}
+          <Box sx={{ minHeight: '100vh', bgcolor: BACKGROUND_DEFAULT, color: TEXT_PRIMARY }}>
             {children}
           </Box>
         </MuiThemeProvider>
@@ -152,20 +162,23 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const drawer = (
     <Box
       onClick={handleDrawerToggle}
-      sx={{ textAlign: "center", bgcolor: "#181c2c", height: "100%" }}
+      // Usando o novo background suave para o Drawer
+      sx={{ textAlign: "center", bgcolor: BACKGROUND_PAPER, height: "100%" }}
     >
-      <Toolbar sx={{ bgcolor: "#181c2c" }}>
+      <Toolbar sx={{ bgcolor: BACKGROUND_PAPER }}>
         <Typography
           variant="h6"
           sx={{
             my: 2,
-            color: "white",
+            // Cor do texto do título
+            color: TEXT_PRIMARY,
           }}
         >
           Girls in STEM
         </Typography>
       </Toolbar>
-      <Divider sx={{ borderColor: "sidebar.border" }} />
+      {/* Cor do divisor */}
+      <Divider sx={{ borderColor: BORDER_COLOR }} />
       <List>
         {navItems.map((item) => (
           <ListItem key={item.text} disablePadding>
@@ -176,23 +189,29 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               sx={{
                 py: 1.5,
                 px: 2,
+                // Cor do texto normal
+                color: TEXT_PRIMARY,
+                "& .MuiListItemIcon-root": {
+                  color: TEXT_SECONDARY, // Ícone normal
+                },
                 "&.Mui-selected": {
-                  bgcolor: "#0e111cff", // Ligeiramente mais escuro para indicar seleção
-                  color: "white",
+                  // Fundo do item selecionado
+                  bgcolor: SELECTED_BG,
+                  color: PRIMARY_MAIN, // Texto selecionado na cor primária
                   "&:hover": {
-                    bgcolor: "#0e111cff",
+                    bgcolor: SELECTED_BG,
                   },
                   "& .MuiListItemIcon-root": {
-                    color: "white",
+                    color: PRIMARY_MAIN, // Ícone selecionado na cor primária
                   },
                 },
                 "&:hover": {
-                  bgcolor: "#0e111cff",
+                  // Fundo ao passar o mouse
+                  bgcolor: HOVER_BG,
                   "& .MuiListItemIcon-root": {
-                    color: "white",
+                    color: TEXT_PRIMARY,
                   },
                 },
-                color: "white",
               }}
             >
               <ListItemIcon sx={{ color: "inherit", bgcolor: "inherit" }}>
@@ -209,21 +228,23 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     // 4. Envolva todo o layout nos provedores
     <NextThemesProvider
-      forcedTheme="light"
+      forcedTheme="dark" // Garante que o NextThemesProvider também esteja em modo escuro
       attribute="class"
       enableSystem={false}
     >
       <MuiThemeProvider theme={muiTheme}>
-        <Box sx={{ display: "flex", bgcolor: "#181c2c", minHeight: '100vh' }}> {/* 👈 Adicionado background no box raiz */}
+        {/* Usando o novo background suave */}
+        <Box sx={{ display: "flex", minHeight: '100vh' }}>
           <AppBar
             position="fixed"
+            color="default" // Usa theme.palette.background.paper
             sx={{
               width: { sm: `calc(100% - ${drawerWidth}px)` },
               ml: { sm: `${drawerWidth}px` },
-              bgcolor: "#181c2c", // 👈 Corrigido o bgcolor do AppBar
-              color: "white",
+              // Remova a linha 'bgcolor: BACKGROUND_PAPER' se usar color="default"
+              color: TEXT_PRIMARY,
               boxShadow: "none",
-              borderBottom: "1px solid hsl(var(--border))",
+              borderBottom: `1px solid ${BORDER_COLOR}`,
             }}
           >
             <Toolbar>
@@ -254,9 +275,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 onClick={handleLogout}
                 sx={{
                   ml: 1,
-                  color: "white", // Ajustado para ser branco
+                  // Cor do ícone de Logout
+                  color: TEXT_PRIMARY,
                   "&:hover": {
-                    backgroundColor: "rgba(255, 255, 255, 0.04)",
+                    backgroundColor: "#1c2635",
                   },
                 }}
               >
@@ -280,8 +302,9 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 "& .MuiDrawer-paper": {
                   boxSizing: "border-box",
                   width: drawerWidth,
-                  bgcolor: "#181c2c",
-                  borderColor: "sidebar.border",
+                  // Cor do Drawer mais suave
+                  bgcolor: BACKGROUND_PAPER,
+                  borderColor: BORDER_COLOR,
                 },
               }}
             >
@@ -295,8 +318,9 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               p: 3,
               width: { sm: `calc(100% - ${drawerWidth}px)` },
               mt: { xs: "56px", sm: "64px" },
-              bgcolor: "#181c2c", // 👈 Adicionado background na área principal
-              color: "white",
+              // Cor da Área Principal mais suave
+              bgcolor: BACKGROUND_DEFAULT,
+              color: TEXT_PRIMARY,
             }}
           >
             {children}

@@ -45,107 +45,104 @@ import {
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
 
+// Definição manual das cores para TEMA ESCURO SUAVE (match AdminLayout/Dashboard)
+const BACKGROUND_DEFAULT = "#2b2f3d"; // Fundo geral (match AdminLayout main background)
+const BACKGROUND_PAPER = "#485164"; // Fundo de Cards/Modals/Tabelas (match Dashboard Card background)
+const TEXT_PRIMARY = "#ffffffff"; // Cor do texto principal (claro)
+const TEXT_SECONDARY = "#a0a0a0"; // Cor do texto secundário/Ícones
+const HOVER_BG = "#414857ff"; // Fundo do hover/botão neutro
+const PRIMARY_MAIN = "#181c2c"; // Cor primária (verde de destaque)
+const BORDER_COLOR = "#3c485c"; // Cor da borda/divisor
+
 const muiTheme = createTheme({
   typography: {
     fontFamily: '"Montserrat", sans-serif',
   },
   palette: {
-    mode: "dark",
+    mode: "dark", 
     background: {
-      default: "#181c2c",
-      paper: "#2d303f",
+      default: BACKGROUND_DEFAULT, 
+      paper: BACKGROUND_PAPER, 
     },
-    // Removi a cor primária de destaque (azul) daqui para não afetar os botões "Adicionar"
-    // Agora, se quiser um botão de destaque, terá que especificar a cor manualmente.
-    // primary: {
-    //   main: "#00e5ff",
-    //   contrastText: "#000000",
-    // },
-    secondary: {
-      main: "#ff4081",
+    primary: {
+        main: PRIMARY_MAIN,
     },
     error: {
-      main: "#ff6b6b",
-    },
-    success: { // Adicionado para chips
-        main: '#4CAF50', // Exemplo de verde
-        dark: '#2E7D32', // Verde mais escuro
-    },
-    warning: { // Adicionado para chips
-        main: '#FFC107', // Exemplo de amarelo
-        dark: '#FFA000', // Laranja mais escuro
+      main: "#ff6b6b", // Vermelho de erro
     },
     text: {
-      primary: "#ffffff",
-      secondary: "#b0b0b0",
+      primary: TEXT_PRIMARY,
+      secondary: TEXT_SECONDARY,
     },
   },
   components: {
+    // Estilos para harmonizar os inputs com o tema escuro suave
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          color: '#ffffff', // Cor do texto do input
+          color: TEXT_PRIMARY,
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(255, 255, 255, 0.2)',
+            borderColor: TEXT_SECONDARY, // Borda sutil
           },
           '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(255, 255, 255, 0.5)',
+            borderColor: TEXT_SECONDARY,
           },
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'rgba(255, 255, 255, 0.7)', // Um tom de cinza claro para o foco
+            borderColor: PRIMARY_MAIN, // Foco na cor primária
           },
         },
       },
     },
     MuiInputLabel: {
-        styleOverrides: {
-            root: {
-                color: 'rgba(255, 255, 255, 0.7)',
-                '&.Mui-focused': {
-                    color: 'rgba(255, 255, 255, 0.9)',
-                }
-            }
+      styleOverrides: {
+        root: {
+          color: TEXT_PRIMARY,
+          '&.Mui-focused': {
+            color: TEXT_PRIMARY, 
+          }
         }
+      }
     },
+    // Estilos para harmonizar a tabela
     MuiTableCell: {
+      styleOverrides: {
+        root: {
+          color: TEXT_PRIMARY,
+          borderColor: BORDER_COLOR, // Linha de grade mais suave
+        },
+        head: {
+          backgroundColor: BACKGROUND_DEFAULT, // Cabeçalho da tabela com o fundo de hover
+          color: TEXT_PRIMARY,
+        }
+      }
+    },
+    // Estilos para harmonizar o diálogo/modal
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: BACKGROUND_PAPER, 
+          color: TEXT_PRIMARY,
+        }
+      }
+    },
+    // Definir cor de fundo dos botões de Dialog (usamos aqui para consistência)
+    MuiDialogActions: {
         styleOverrides: {
             root: {
-                color: '#ffffff',
-                borderColor: '#2d303f',
-            },
-            head: {
-                backgroundColor: '#2d303f',
-                color: '#ffffff',
+                backgroundColor: "#666e7e",
             }
         }
     },
-    // Estilo para Select (MenuItem)
-    MuiMenu: {
-        styleOverrides: {
-            paper: {
-                backgroundColor: '#2d303f', // Fundo do dropdown do Select
-                color: '#ffffff',
-            },
-        },
-    },
-    MuiMenuItem: {
+    MuiDialogTitle: {
         styleOverrides: {
             root: {
-                color: '#ffffff',
-                '&:hover': {
-                    backgroundColor: '#3f485c', // Cor de hover para itens do dropdown
-                },
-                '&.Mui-selected': {
-                    backgroundColor: '#3f485c', // Cor de seleção para itens do dropdown
-                    '&:hover': {
-                        backgroundColor: '#3f485c',
-                    },
-                },
-            },
-        },
-    },
+                backgroundColor: "#666e7e",
+            }
+        }
+    }
   }
 });
+
 
 const ProjectsPage = () => {
   const [projects, setProjects] = useState<Project[]>(mockProjects);
@@ -213,37 +210,43 @@ const ProjectsPage = () => {
     <MuiThemeProvider theme={muiTheme}>
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
-          <Typography variant="h5" component="h1" fontWeight="semibold">
+          <Typography 
+            variant="h5" 
+            component="h1" 
+            fontWeight="semibold"
+            color="text.primary" // Corrigido para a cor de texto suave
+          >
             Gerenciar Projetos
           </Typography>
           <Button
             variant="contained"
-            // MUDANÇA: Removido color="primary". Definindo cor de fundo manualmente.
-            sx={{
-                bgcolor: '#3f485c', // Cor de fundo neutra, mas visível
-                color: 'white',
-                '&:hover': {
-                    bgcolor: '#4f5a70', // Cor um pouco mais clara no hover
-                },
-            }}
             startIcon={<PlusCircleIcon />}
             onClick={() => {
               setEditingProject(null);
               setNewProjectData({ name: "", startDate: "", endDate: "" });
               setIsDialogOpen(true);
             }}
+            // Estilo do botão neutro, usando as novas cores suaves
+            sx={{
+                bgcolor: HOVER_BG, 
+                color: TEXT_PRIMARY,
+                '&:hover': {
+                    bgcolor: BORDER_COLOR, 
+                },
+            }}
           >
             Adicionar Projeto
           </Button>
 
-          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} PaperProps={{ sx: { bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary } }}>
-            <DialogTitle sx={{ backgroundColor: muiTheme.palette.background.default, color: muiTheme.palette.text.primary }}>
+          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+            <DialogTitle color="text.primary">
                 {editingProject ? "Editar Projeto" : "Adicionar Novo Projeto"}
             </DialogTitle>
-            <DialogContent sx={{backgroundColor: muiTheme.palette.background.paper}}>
-              <DialogContentText color={muiTheme.palette.text.secondary}>
+            <DialogContent>
+              <DialogContentText color="text.primary">
                 Preencha os detalhes do projeto aqui. Clique em salvar quando terminar.
               </DialogContentText>
+              {/* TextFields herdam os novos estilos de Input e Label */}
               <TextField
                 autoFocus
                 margin="dense"
@@ -284,17 +287,17 @@ const ProjectsPage = () => {
                 sx={{ mt: 2 }}
               />
             </DialogContent>
-            <DialogActions sx={{ backgroundColor: muiTheme.palette.background.paper }}>
-              <Button onClick={() => setIsDialogOpen(false)} color="inherit">Cancelar</Button>
+            <DialogActions>
+              <Button onClick={() => setIsDialogOpen(false)} color="inherit" sx={{ color: TEXT_PRIMARY }}>Cancelar</Button>
               <Button 
                 onClick={handleAddProject} 
                 variant="contained" 
-                // MUDANÇA: Removido color="primary". Definindo cor de fundo manualmente.
+                // Botão de salvar com estilo neutro/suave
                 sx={{
-                    bgcolor: '#3f485c', // Cor de fundo neutra
-                    color: 'white',
+                    bgcolor: HOVER_BG, 
+                    color: TEXT_PRIMARY,
                     '&:hover': {
-                        bgcolor: '#4f5a70', // Cor um pouco mais clara no hover
+                        bgcolor: BORDER_COLOR, 
                     },
                 }}
               >
@@ -304,21 +307,22 @@ const ProjectsPage = () => {
           </Dialog>
         </div>
         
-        <Card sx={{ bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary }}>
-          <CardHeader title={<Typography variant="h6" color="white">Lista de Projetos</Typography>} />
+        {/* Card e Tabela ajustados para tema escuro suave */}
+        <Card sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}>
+          <CardHeader title={<Typography variant="h6" color="text.primary">Lista de Projetos</Typography>} />
           <CardContent>
             {projects.length === 0 ? (
-              <Typography color="white">
+              <Typography color="text.secondary">
                 Nenhum projeto encontrado.
               </Typography>
             ) : (
               <TableContainer 
                 component={Paper} 
                 sx={{ 
-                    backgroundColor: muiTheme.palette.background.paper,
-                    color: muiTheme.palette.text.primary, 
+                    backgroundColor: BACKGROUND_PAPER,
+                    color: TEXT_PRIMARY, 
                     boxShadow: 'none',
-                    border: '1px solid #3f485c',
+                    border: `1px solid ${BORDER_COLOR}`, // Borda sutil
                 }}
               >
                 <Table>
@@ -332,7 +336,14 @@ const ProjectsPage = () => {
                   </TableHead>
                   <TableBody>
                     {projects.map((project) => (
-                      <TableRow key={project.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                      <TableRow 
+                        key={project.id} 
+                        sx={{ 
+                            '&:last-child td, &:last-child th': { border: 0 },
+                            // Efeito hover na linha para destacar
+                            '&:hover': { backgroundColor: HOVER_BG, '& .MuiTableCell-root': { color: TEXT_PRIMARY } }
+                        }}
+                      >
                         <TableCell component="th" scope="row">
                           {project.name}
                         </TableCell>
@@ -343,7 +354,8 @@ const ProjectsPage = () => {
                             variant="text"
                             size="small"
                             onClick={() => handleEditClick(project)}
-                            sx={{ minWidth: 'auto', p: 1, color: muiTheme.palette.text.secondary }}
+                            // Ícone de Edição discreto
+                            sx={{ minWidth: 'auto', p: 1, color: TEXT_PRIMARY }}
                           >
                             <EditIcon fontSize="small" />
                           </Button>
@@ -356,21 +368,21 @@ const ProjectsPage = () => {
                           >
                             <Trash2Icon fontSize="small" />
                           </Button>
+                          {/* Dialog de Confirmação */}
                           <Dialog
                             open={isConfirmDialogOpen && projectToDeleteId === project.id}
                             onClose={() => setIsConfirmDialogOpen(false)}
-                            PaperProps={{ sx: { bgcolor: muiTheme.palette.background.paper, color: muiTheme.palette.text.primary } }}
                             aria-labelledby="alert-dialog-title"
                             aria-describedby="alert-dialog-description"
                           >
-                            <DialogTitle id="alert-dialog-title" sx={{ backgroundColor: muiTheme.palette.background.default, color: muiTheme.palette.text.primary }}>{"Tem certeza?"}</DialogTitle>
-                            <DialogContent sx={{backgroundColor: muiTheme.palette.background.paper}}>
-                              <DialogContentText id="alert-dialog-description" color={muiTheme.palette.text.secondary}>
+                            <DialogTitle id="alert-dialog-title" color="text.primary">{"Tem certeza?"}</DialogTitle>
+                            <DialogContent>
+                              <DialogContentText id="alert-dialog-description" color="text.secondary">
                                 Esta ação não pode ser desfeita. Isso excluirá permanentemente o projeto.
                               </DialogContentText>
                             </DialogContent>
-                            <DialogActions sx={{ backgroundColor: muiTheme.palette.background.paper }}>
-                              <Button onClick={() => setIsConfirmDialogOpen(false)} color="inherit">Cancelar</Button>
+                            <DialogActions>
+                              <Button onClick={() => setIsConfirmDialogOpen(false)} color="inherit" sx={{ color: TEXT_SECONDARY }}>Cancelar</Button>
                               <Button onClick={handleDeleteConfirmed} autoFocus variant="contained" color="error">
                                 Continuar
                               </Button>
