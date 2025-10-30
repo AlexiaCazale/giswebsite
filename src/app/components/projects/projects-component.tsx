@@ -18,7 +18,7 @@ export interface Project {
   alt?: string;
 }
 
-const dataProjects = [
+export const dataProjects = [
   {
     id: 1,
     name: "Inteligência Artificial",

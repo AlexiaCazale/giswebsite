@@ -6,6 +6,7 @@ import SlideComponentProjects from "./slide-component-projects";
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError } from "@/utils/toast";
+import { dataProjects } from "./projects-component";
 
 // Interface para Projetos (ajustada para o novo esquema do DB)
 export interface ProjectDetailItem {
@@ -120,7 +121,7 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
             Veja outros projetos
           </h1>
           <div className="w-[100%] py-10">
-            <SlideComponentProjects />
+            <SlideComponentProjects slides={dataProjects} />
           </div>
           <div className="flex justify-center mb-4">
             <button className="px-6 py-2 border border-white rounded-lg hover:bg-white hover:text-black transition-colors">

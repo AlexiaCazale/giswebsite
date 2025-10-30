@@ -51,7 +51,7 @@ function SlideComponentNews({ slides }: SlideComponentNewsProps) {
         speed: 500,
         slidesToShow,
         slidesToScroll,
-        arrows: false,
+        // arrows: false,
     };
 
     return (

@@ -43,7 +43,7 @@ function SlideComponentProjects({ slides }: SlideComponentProjectsProps) {
     speed: 500,
     slidesToShow,
     slidesToScroll,
-    arrows: false,
+    // arrows: false,
   };
 
   return (
