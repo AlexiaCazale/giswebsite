@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -20,16 +20,8 @@ import {
   TableRow,
   TableContainer,
   Paper,
-  InputLabel,
-  FormControl,
-  Select,
-  MenuItem,
-  Chip,
-  LinearProgress,
+  CircularProgress,
   SelectChangeEvent,
-  ChipProps,
-  SxProps,
-  Theme,
   Box,
 } from "@mui/material";
 import {
@@ -37,22 +29,35 @@ import {
   Edit as EditIcon,
   Delete as Trash2Icon,
 } from "@mui/icons-material";
-import { showSuccess } from "@/utils/toast";
-import { mockProjects, Project } from "@/app/lib/data";
-
+import { showSuccess, showError } from "@/utils/toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   createTheme,
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
+import ImageUpload from "@/app/components/admin/ImageUpload"; // Importar o novo componente
+import { v4 as uuidv4 } from "uuid"; // Importar uuid para nomes de arquivos únicos
+
+// Interface para Projetos (ajustada para o novo esquema do DB)
+interface ProjectItem {
+  id: string;
+  name: string;
+  description?: string;
+  date: string;
+  cover_image?: string; // Nova coluna para imagem de capa
+  images?: string; // JSON string of string[] para galeria
+  created_at: string;
+  user_id: string;
+}
 
 // Definição manual das cores para TEMA ESCURO SUAVE (match AdminLayout/Dashboard)
-const BACKGROUND_DEFAULT = "#2b2f3d"; // Fundo geral (match AdminLayout main background)
-const BACKGROUND_PAPER = "#485164"; // Fundo de Cards/Modals/Tabelas (match Dashboard Card background)
-const TEXT_PRIMARY = "#ffffffff"; // Cor do texto principal (claro)
-const TEXT_SECONDARY = "#a0a0a0"; // Cor do texto secundário/Ícones
-const HOVER_BG = "#414857ff"; // Fundo do hover/botão neutro
-const PRIMARY_MAIN = "#181c2c"; // Cor primária (verde de destaque)
-const BORDER_COLOR = "#3c485c"; // Cor da borda/divisor
+const BACKGROUND_DEFAULT = "#2b2f3d";
+const BACKGROUND_PAPER = "#485164";
+const TEXT_PRIMARY = "#ffffffff";
+const TEXT_SECONDARY = "#a0a0a0";
+const HOVER_BG = "#414857ff";
+const PRIMARY_MAIN = "#181c2c";
+const BORDER_COLOR = "#3c485c";
 
 const muiTheme = createTheme({
   typography: {
@@ -145,40 +150,235 @@ const muiTheme = createTheme({
 
 
 const ProjectsPage = () => {
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [projects, setProjects] = useState<ProjectItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [newProjectData, setNewProjectData] = useState<Omit<Project, "id" | "members"> & { id?: string, members?: string }>(
-    { name: "", startDate: "", endDate: "" }
+  const [editingProject, setEditingProject] = useState<ProjectItem | null>(null);
+  const [newProjectData, setNewProjectData] = useState<Omit<ProjectItem, "id" | "created_at" | "user_id"> & { id?: string }>(
+    { name: "", description: "", date: "", cover_image: "", images: "" }
   );
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [projectToDeleteId, setProjectToDeleteId] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({}); // Estado para erros do formulário
 
-  const handleAddProject = () => {
-    if (editingProject) {
-      setProjects(
-        projects.map((p) =>
-          p.id === editingProject.id ? { ...newProjectData, id: p.id, members: [] } as Project : p
-        )
-      );
-      showSuccess("Projeto atualizado com sucesso!");
+  // Estados para o ImageUpload da capa
+  const [selectedNewCoverFile, setSelectedNewCoverFile] = useState<File[]>([]);
+  const [currentCoverImageUrlForUpload, setCurrentCoverImageUrlForUpload] = useState<string[]>([]);
+
+  // Estados para o ImageUpload da galeria
+  const [selectedNewGalleryFiles, setSelectedNewGalleryFiles] = useState<File[]>([]);
+  const [currentGalleryImageUrlsForUpload, setCurrentGalleryImageUrlsForUpload] = useState<string[]>([]);
+
+  const fetchProjects = async () => {
+    setLoading(true);
+    const { data: user, error: userError } = await supabase.auth.getUser();
+    if (userError || !user?.user) {
+      showError("Você precisa estar logado para ver os projetos.");
+      setLoading(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("user_id", user.user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      showError("Erro ao buscar projetos: " + error.message);
     } else {
-      const newId = `p${projects.length + 1}`;
-      setProjects([...projects, { ...newProjectData, id: newId, members: [] } as Project]);
-      showSuccess("Projeto adicionado com sucesso!");
+      setProjects(data as ProjectItem[]);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  // Função de validação
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+    if (!newProjectData.name.trim()) {
+      errors.name = "O nome do projeto é obrigatório.";
+    }
+    if (!newProjectData.description?.trim()) {
+      errors.description = "A descrição do projeto é obrigatória.";
+    }
+    if (!newProjectData.date) {
+      errors.date = "A data do projeto é obrigatória.";
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const uploadImage = async (file: File, userId: string, bucketName: string): Promise<string | null> => {
+    const fileExtension = file.name.split(".").pop();
+    const fileName = `${uuidv4()}.${fileExtension}`;
+    const filePath = `${userId}/${fileName}`; // Pasta por user_id
+
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (error) {
+      showError("Erro ao fazer upload da imagem: " + error.message);
+      return null;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+  };
+
+  const deleteImageFromStorage = async (imageUrl: string, bucketName: string) => {
+    if (!imageUrl) return;
+    try {
+      const parts = imageUrl.split('/');
+      const filePath = parts.slice(parts.length - 2).join('/'); // Extrai 'user_id/filename.ext'
+      const { error } = await supabase.storage
+        .from(bucketName)
+        .remove([filePath]);
+      if (error) {
+        console.error(`Erro ao excluir imagem do bucket ${bucketName}:`, error.message);
+      }
+    } catch (e) {
+      console.error("Erro ao parsear URL da imagem para exclusão:", e);
+    }
+  };
+
+  const handleAddOrUpdateProject = async () => {
+    if (!validateForm()) {
+      showError("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    const { data: user, error: userError } = await supabase.auth.getUser();
+    if (userError || !user?.user) {
+      showError("Você precisa estar logado para adicionar/editar projetos.");
+      return;
+    }
+
+    // --- Lógica para Imagem de Capa ---
+    let finalCoverImageUrl: string | null = newProjectData.cover_image || null;
+    if (selectedNewCoverFile.length > 0) {
+      // Se um novo arquivo de capa foi selecionado, faça o upload
+      const uploadedUrl = await uploadImage(selectedNewCoverFile[0], user.user.id, "project-cover-images");
+      if (uploadedUrl) {
+        // Se havia uma imagem de capa antiga e uma nova foi carregada, exclua a antiga
+        if (editingProject?.cover_image && editingProject.cover_image !== uploadedUrl) {
+          await deleteImageFromStorage(editingProject.cover_image, "project-cover-images");
+        }
+        finalCoverImageUrl = uploadedUrl;
+      } else {
+        return; // Falha no upload da capa
+      }
+    } else if (currentCoverImageUrlForUpload.length === 0 && editingProject?.cover_image) {
+      // Se a imagem de capa existente foi removida (currentCoverImageUrlForUpload está vazio)
+      await deleteImageFromStorage(editingProject.cover_image, "project-cover-images");
+      finalCoverImageUrl = null;
+    } else if (currentCoverImageUrlForUpload.length > 0) {
+      // Se a imagem de capa existente foi mantida
+      finalCoverImageUrl = currentCoverImageUrlForUpload[0];
+    } else {
+      finalCoverImageUrl = null;
+    }
+
+
+    // --- Lógica para Imagens da Galeria ---
+    let finalGalleryImageUrls: string[] = [...currentGalleryImageUrlsForUpload];
+    for (const file of selectedNewGalleryFiles) {
+      const uploadedUrl = await uploadImage(file, user.user.id, "project-gallery-images");
+      if (uploadedUrl) {
+        finalGalleryImageUrls.push(uploadedUrl);
+      } else {
+        return; // Falha no upload da galeria
+      }
+    }
+
+    // Identificar imagens da galeria que foram removidas
+    const oldGalleryUrls: string[] = editingProject?.images ? JSON.parse(editingProject.images) : [];
+    const removedGalleryUrls = oldGalleryUrls.filter(url => !finalGalleryImageUrls.includes(url));
+    for (const url of removedGalleryUrls) {
+      await deleteImageFromStorage(url, "project-gallery-images");
+    }
+
+    const imagesJsonString = JSON.stringify(finalGalleryImageUrls);
+
+    if (editingProject) {
+      const { error } = await supabase
+        .from("projects")
+        .update({
+          name: newProjectData.name,
+          description: newProjectData.description,
+          date: newProjectData.date,
+          cover_image: finalCoverImageUrl, // Atualiza a capa
+          images: imagesJsonString, // Atualiza a galeria
+        })
+        .eq("id", editingProject.id)
+        .eq("user_id", user.user.id);
+
+      if (error) {
+        showError("Erro ao atualizar projeto: " + error.message);
+      } else {
+        showSuccess("Projeto atualizado com sucesso!");
+        fetchProjects();
+      }
+    } else {
+      const { error } = await supabase.from("projects").insert({
+        user_id: user.user.id,
+        name: newProjectData.name,
+        description: newProjectData.description,
+        date: newProjectData.date,
+        cover_image: finalCoverImageUrl, // Insere a capa
+        images: imagesJsonString, // Insere a galeria
+      });
+
+      if (error) {
+        showError("Erro ao adicionar projeto: " + error.message);
+      } else {
+        showSuccess("Projeto adicionado com sucesso!");
+        fetchProjects();
+      }
     }
     setIsDialogOpen(false);
     setEditingProject(null);
-    setNewProjectData({ name: "", startDate: "", endDate: "" });
+    setNewProjectData({ name: "", description: "", date: "", cover_image: "", images: "" });
+    setSelectedNewCoverFile([]);
+    setCurrentCoverImageUrlForUpload([]);
+    setSelectedNewGalleryFiles([]);
+    setCurrentGalleryImageUrlsForUpload([]);
+    setFormErrors({}); // Limpar erros do formulário
   };
 
-  const handleEditClick = (project: Project) => {
+  const handleEditClick = (project: ProjectItem) => {
     setEditingProject(project);
-    const dataForState = {
-      ...project,
-      members: project.members.join(', '),
-    };
-    setNewProjectData(dataForState);
+    setNewProjectData({
+      name: project.name,
+      description: project.description || "",
+      date: project.date,
+      cover_image: project.cover_image || "",
+      images: project.images || "",
+    });
+    // Preencher o ImageUpload da capa
+    setCurrentCoverImageUrlForUpload(project.cover_image ? [project.cover_image] : []);
+    setSelectedNewCoverFile([]);
+
+    // Preencher o ImageUpload da galeria
+    try {
+      const existingGalleryUrls = project.images ? JSON.parse(project.images) : [];
+      setCurrentGalleryImageUrlsForUpload(existingGalleryUrls);
+    } catch (e) {
+      console.error("Erro ao parsear URLs de imagem da galeria existentes:", e);
+      setCurrentGalleryImageUrlsForUpload([]);
+    }
+    setSelectedNewGalleryFiles([]);
+    setFormErrors({}); // Limpar erros do formulário
     setIsDialogOpen(true);
   };
 
@@ -187,10 +387,45 @@ const ProjectsPage = () => {
     setIsConfirmDialogOpen(true);
   };
 
-  const handleDeleteConfirmed = () => {
+  const handleDeleteConfirmed = async () => {
     if (projectToDeleteId) {
-      setProjects(projects.filter((project) => project.id !== projectToDeleteId));
-      showSuccess("Projeto excluído com sucesso!");
+      const { data: user, error: userError } = await supabase.auth.getUser();
+      if (userError || !user?.user) {
+        showError("Você precisa estar logado para excluir projetos.");
+        return;
+      }
+
+      const projectToDelete = projects.find(p => p.id === projectToDeleteId);
+      if (projectToDelete) {
+        // Excluir imagem de capa do storage
+        if (projectToDelete.cover_image) {
+          await deleteImageFromStorage(projectToDelete.cover_image, "project-cover-images");
+        }
+        // Excluir imagens da galeria do storage
+        if (projectToDelete.images) {
+          try {
+            const imageUrls: string[] = JSON.parse(projectToDelete.images);
+            for (const url of imageUrls) {
+              await deleteImageFromStorage(url, "project-gallery-images");
+            }
+          } catch (e) {
+            console.error("Erro ao parsear URLs de imagem da galeria para exclusão:", e);
+          }
+        }
+      }
+
+      const { error } = await supabase
+        .from("projects")
+        .delete()
+        .eq("id", projectToDeleteId)
+        .eq("user_id", user.user.id);
+
+      if (error) {
+        showError("Erro ao excluir projeto: " + error.message);
+      } else {
+        showSuccess("Projeto excluído com sucesso!");
+        fetchProjects();
+      }
       setProjectToDeleteId(null);
       setIsConfirmDialogOpen(false);
     }
@@ -204,6 +439,8 @@ const ProjectsPage = () => {
       ...prev,
       [name as string]: value,
     }));
+    // Limpar erro específico ao digitar
+    setFormErrors(prev => ({ ...prev, [name as string]: "" }));
   };
 
   return (
@@ -214,7 +451,7 @@ const ProjectsPage = () => {
             variant="h5" 
             component="h1" 
             fontWeight="semibold"
-            color="text.primary" // Corrigido para a cor de texto suave
+            color="text.primary"
           >
             Gerenciar Projetos
           </Typography>
@@ -223,10 +460,14 @@ const ProjectsPage = () => {
             startIcon={<PlusCircleIcon />}
             onClick={() => {
               setEditingProject(null);
-              setNewProjectData({ name: "", startDate: "", endDate: "" });
+              setNewProjectData({ name: "", description: "", date: "", cover_image: "", images: "" });
+              setSelectedNewCoverFile([]);
+              setCurrentCoverImageUrlForUpload([]);
+              setSelectedNewGalleryFiles([]);
+              setCurrentGalleryImageUrlsForUpload([]);
+              setFormErrors({}); // Limpar erros do formulário
               setIsDialogOpen(true);
             }}
-            // Estilo do botão neutro, usando as novas cores suaves
             sx={{
                 bgcolor: HOVER_BG, 
                 color: TEXT_PRIMARY,
@@ -238,15 +479,14 @@ const ProjectsPage = () => {
             Adicionar Projeto
           </Button>
 
-          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-            <DialogTitle color="text.primary">
+          <Dialog open={isDialogOpen} onClose={() => {setIsDialogOpen(false); setFormErrors({});}}>
+            <DialogTitle color="text.primary" sx={{ bgcolor: "#666e7e" }}>
                 {editingProject ? "Editar Projeto" : "Adicionar Novo Projeto"}
             </DialogTitle>
             <DialogContent>
               <DialogContentText color="text.primary">
                 Preencha os detalhes do projeto aqui. Clique em salvar quando terminar.
               </DialogContentText>
-              {/* TextFields herdam os novos estilos de Input e Label */}
               <TextField
                 autoFocus
                 margin="dense"
@@ -259,40 +499,61 @@ const ProjectsPage = () => {
                 value={newProjectData.name}
                 onChange={handleInputChange}
                 sx={{ mt: 2 }}
+                error={!!formErrors.name}
+                helperText={formErrors.name}
               />
               <TextField
                 margin="dense"
-                id="startDate"
-                label="Data Início"
-                name="startDate"
+                id="description"
+                label="Descrição"
+                name="description"
+                multiline
+                rows={3}
+                fullWidth
+                variant="outlined"
+                value={newProjectData.description}
+                onChange={handleInputChange}
+                sx={{ mt: 2 }}
+                error={!!formErrors.description}
+                helperText={formErrors.description}
+              />
+              <TextField
+                margin="dense"
+                id="date"
+                label="Data do Projeto"
+                name="date"
                 type="date"
                 fullWidth
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
-                value={newProjectData.startDate}
+                value={newProjectData.date}
                 onChange={handleInputChange}
                 sx={{ mt: 2 }}
+                error={!!formErrors.date}
+                helperText={formErrors.date}
               />
-              <TextField
-                margin="dense"
-                id="endDate"
-                label="Data Fim"
-                name="endDate"
-                type="date"
-                fullWidth
-                variant="outlined"
-                InputLabelProps={{ shrink: true }}
-                value={newProjectData.endDate || ""}
-                onChange={handleInputChange}
-                sx={{ mt: 2 }}
+              {/* Componente ImageUpload para a imagem de capa (single) */}
+              <ImageUpload
+                label="Imagem de Capa do Projeto"
+                initialImageUrls={currentCoverImageUrlForUpload}
+                onImageUrlsChange={setCurrentCoverImageUrlForUpload}
+                onNewFilesChange={setSelectedNewCoverFile}
+                multiple={false} // Apenas uma imagem para capa
+              />
+              {/* Componente ImageUpload para as imagens da galeria (multiple) */}
+              <ImageUpload
+                label="Imagens da Galeria do Projeto"
+                initialImageUrls={currentGalleryImageUrlsForUpload}
+                onImageUrlsChange={setCurrentGalleryImageUrlsForUpload}
+                onNewFilesChange={setSelectedNewGalleryFiles}
+                multiple={true} // Permitir múltiplas imagens
               />
             </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setIsDialogOpen(false)} color="inherit" sx={{ color: TEXT_PRIMARY }}>Cancelar</Button>
+            <DialogActions sx={{ bgcolor: "#666e7e" }}>
+              <Button onClick={() => {setIsDialogOpen(false); setFormErrors({});}} color="inherit" sx={{ color: TEXT_PRIMARY }}>Cancelar</Button>
               <Button 
-                onClick={handleAddProject} 
+                onClick={handleAddOrUpdateProject} 
                 variant="contained" 
-                // Botão de salvar com estilo neutro/suave
                 sx={{
                     bgcolor: HOVER_BG, 
                     color: TEXT_PRIMARY,
@@ -307,11 +568,21 @@ const ProjectsPage = () => {
           </Dialog>
         </div>
         
-        {/* Card e Tabela ajustados para tema escuro suave */}
         <Card sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}>
           <CardHeader title={<Typography variant="h6" color="text.primary">Lista de Projetos</Typography>} />
           <CardContent>
-            {projects.length === 0 ? (
+            {loading ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  minHeight: 200,
+                }}
+              >
+                <CircularProgress sx={{ color: TEXT_PRIMARY }} />
+              </Box>
+            ) : projects.length === 0 ? (
               <Typography color="text.secondary">
                 Nenhum projeto encontrado.
               </Typography>
@@ -322,15 +593,17 @@ const ProjectsPage = () => {
                     backgroundColor: BACKGROUND_PAPER,
                     color: TEXT_PRIMARY, 
                     boxShadow: 'none',
-                    border: `1px solid ${BORDER_COLOR}`, // Borda sutil
+                    border: `1px solid ${BORDER_COLOR}`,
                 }}
               >
                 <Table>
                   <TableHead>
                     <TableRow>
                       <TableCell>Nome</TableCell>
-                      <TableCell>Data Início</TableCell>
-                      <TableCell>Data Fim</TableCell>
+                      <TableCell>Descrição</TableCell>
+                      <TableCell>Data</TableCell>
+                      <TableCell>Capa</TableCell>
+                      <TableCell>Galeria</TableCell>
                       <TableCell align="right">Ações</TableCell>
                     </TableRow>
                   </TableHead>
@@ -340,21 +613,21 @@ const ProjectsPage = () => {
                         key={project.id} 
                         sx={{ 
                             '&:last-child td, &:last-child th': { border: 0 },
-                            // Efeito hover na linha para destacar
                             '&:hover': { backgroundColor: HOVER_BG, '& .MuiTableCell-root': { color: TEXT_PRIMARY } }
                         }}
                       >
                         <TableCell component="th" scope="row">
                           {project.name}
                         </TableCell>
-                        <TableCell>{project.startDate}</TableCell>
-                        <TableCell>{project.endDate || "N/A"}</TableCell>
+                        <TableCell>{project.description || "N/A"}</TableCell>
+                        <TableCell>{new Date(project.date).toLocaleDateString()}</TableCell>
+                        <TableCell>{project.cover_image ? "Sim" : "Não"}</TableCell>
+                        <TableCell>{project.images && JSON.parse(project.images).length > 0 ? "Sim" : "Não"}</TableCell>
                         <TableCell align="right">
                           <Button
                             variant="text"
                             size="small"
                             onClick={() => handleEditClick(project)}
-                            // Ícone de Edição discreto
                             sx={{ minWidth: 'auto', p: 1, color: TEXT_PRIMARY }}
                           >
                             <EditIcon fontSize="small" />
@@ -368,20 +641,19 @@ const ProjectsPage = () => {
                           >
                             <Trash2Icon fontSize="small" />
                           </Button>
-                          {/* Dialog de Confirmação */}
                           <Dialog
                             open={isConfirmDialogOpen && projectToDeleteId === project.id}
                             onClose={() => setIsConfirmDialogOpen(false)}
                             aria-labelledby="alert-dialog-title"
                             aria-describedby="alert-dialog-description"
                           >
-                            <DialogTitle id="alert-dialog-title" color="text.primary">{"Tem certeza?"}</DialogTitle>
+                            <DialogTitle id="alert-dialog-title" color="text.primary" sx={{ bgcolor: "#666e7e" }}>{"Tem certeza?"}</DialogTitle>
                             <DialogContent>
                               <DialogContentText id="alert-dialog-description" color="text.secondary">
                                 Esta ação não pode ser desfeita. Isso excluirá permanentemente o projeto.
                               </DialogContentText>
                             </DialogContent>
-                            <DialogActions>
+                            <DialogActions sx={{ bgcolor: "#666e7e" }}>
                               <Button onClick={() => setIsConfirmDialogOpen(false)} color="inherit" sx={{ color: TEXT_SECONDARY }}>Cancelar</Button>
                               <Button onClick={handleDeleteConfirmed} autoFocus variant="contained" color="error">
                                 Continuar

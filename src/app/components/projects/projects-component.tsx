@@ -1,70 +1,78 @@
+"use client";
+
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SlideComponentProjects from "./slide-component-projects";
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
 
+// Interface para Projetos (ajustada para o novo esquema do DB)
+export interface Project {
+  id: number;
+  name: string;
+  description: string;
+  cover_image?: string; // Renomeado de imgUrl para cover_image
+  images?: string; // JSON string of string[] for gallery
+  alt?: string;
+}
 
-export const dataProjects = [
-  {
-    id: 0,
-    name: "Inteligência Artificial",
-    description:
-      "Projeto de apresentação realizado pela profª Cida Zem para os alunos da escola EMI Ana Franco, durante um bate-papo sobre inteligência artificial, tecnologia na educação, inclusão e a importância das mulheres na tecnologia.",
-    imgUrl: "/projects/ia-capa.jpeg",
-    src: "/projects/ia-capa.jpeg",
-    alt: "Projeto 1",
-    gallery: [
-      { id: "1", img: "/projects/IA/20241011_140610.jpg", height: 400 },
-      { id: "2", img: "/projects/IA/20241011_142241.jpg", height: 300 },
-      { id: "3", img: "/projects/IA/20241011_144416.jpg", height: 500 },
-    ],
-  },
+const dataProjects = [
   {
     id: 1,
-    name: "Girassol Arduino",
-    description:
-      "Projeto de Arduino desenvolvido pelos alunos do grupo de pesquisa Girls in STEM, apresentado durante o evento Fatec de Portas Abertas em 2024 e também para os estudantes da escola EMI Ana Franco, com a orientação dos professores Josiane e Felipe.",
-    imgUrl: "/projects/girassolCapa.jpeg",
-    src: "/projects/girassolCapa.jpeg",
-    alt: "Projeto 2",
-    gallery: [
-      { id: "1", img: "/projects/girassol/20241009_121459.jpg", height: 350 },
-      { id: "2", img: "/projects/girassol/20241011_133156.jpg", height: 450 },
-      { id: "3", img: "/projects/girassol/20241011_143451.jpg", height: 400 },
-      { id: "4", img: "/projects/girassol/20241018_101320.jpg", height: 400 },
-    ],
+    name: "Inteligência Artificial",
+    description: "Projeto de IA",
+    cover_image: "/projects/ia-capa.jpeg",
+    alt: "Projeto de IA",
   },
   {
     id: 2,
-    name: "Girassol Arduino",
-    description:
-      "Projeto de Arduino desenvolvido pelos alunos do grupo de pesquisa Girls in STEM, apresentado durante o evento Fatec de Portas Abertas em 2024 e também para os estudantes da escola EMI Ana Franco, com a orientação dos professores Josiane e Felipe.",
-    imgUrl: "/projects/girassolCapa.jpeg",
-    src: "/projects/girassolCapa.jpeg",
-    alt: "Projeto 2",
+    name: "Girassol",
+    description: "Projeto Girassol",
+    cover_image: "/projects/girassolCapa.jpeg",
+    alt: "Projeto Girassol",
   },
   {
     id: 3,
-    name: "Girassol Arduino",
-    description:
-      "Projeto de Arduino desenvolvido pelos alunos do grupo de pesquisa Girls in STEM, apresentado durante o evento Fatec de Portas Abertas em 2024 e também para os estudantes da escola EMI Ana Franco, com a orientação dos professores Josiane e Felipe.",
-    imgUrl: "/projects/girassolCapa.jpeg",
-    src: "/projects/girassolCapa.jpeg",
-    alt: "Projeto 2",
+    name: "Inteligência Artificial",
+    description: "Projeto de IA",
+    cover_image: "/projects/ia-capa.jpeg",
+    alt: "Projeto de IA",
   },
   {
     id: 4,
-    name: "Girassol Arduino",
-    description:
-      "Projeto de Arduino desenvolvido pelos alunos do grupo de pesquisa Girls in STEM, apresentado durante o evento Fatec de Portas Abertas em 2024 e também para os estudantes da escola EMI Ana Franco, com a orientação dos professores Josiane e Felipe.",
-    src: "/projects/girassolCapa.jpeg",
-    imgUrl: "/projects/girassolCapa.jpeg",
-    alt: "Projeto 2",
+    name: "Girassol",
+    description: "Projeto Girassol",
+    cover_image: "/projects/girassolCapa.jpeg",
+    alt: "Projeto Girassol",
+  },
+  {
+    id: 5,
+    name: "Inteligência Artificial",
+    description: "Projeto de IA",
+    cover_image: "/projects/ia-capa.jpeg",
+    alt: "Projeto de IA",
+  },
+  {
+    id: 6,
+    name: "Girassol",
+    description: "Projeto Girassol",
+    cover_image: "/projects/girassolCapa.jpeg",
+    alt: "Projeto Girassol",
   },
 ];
 
 export default function Projects() {
+  const [projectsList, setProjectsList] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Revertendo para dados mockados
+    setProjectsList(dataProjects);
+    setLoading(false);
+  }, []);
+
   return (
     <React.Fragment>
       <div className="flex md:flex-row flex-col bg-[#2f3e43] justify-between h-screen w-[100%] lg:w-screen p-[30px] md:px-16 items-center justify-center" id="projetos">
@@ -73,7 +81,17 @@ export default function Projects() {
             <h1 className=" text-center md:text-start">Projetos</h1>
             <p className="text-center md:text-start">Fique por dentro dos nossos projetos.</p>
           </div>
-          <SlideComponentProjects />
+          {loading ? (
+            <div className="flex justify-center items-center h-40">
+              <p className="text-white">Carregando projetos...</p>
+            </div>
+          ) : projectsList.length === 0 ? (
+            <div className="flex justify-center items-center h-40">
+              <p className="text-white">Nenhum projeto encontrado.</p>
+            </div>
+          ) : (
+            <SlideComponentProjects slides={projectsList} />
+          )}
         </div>
         <div className="hidden lg:flex relative h-screen md:w-[100%] md:w-1/3">
           <Image

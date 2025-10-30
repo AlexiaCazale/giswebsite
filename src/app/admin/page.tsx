@@ -1,43 +1,49 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button, TextField, Typography, Box, Paper } from "@mui/material";
+import { Button, TextField, Typography, Box, Paper, CircularProgress } from "@mui/material";
 import { showSuccess, showError } from "@/utils/toast";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/integrations/supabase/client"; // Importar cliente Supabase
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Estado de carregamento para o botão
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
-    if (email === "teste@teste.com" && password === "123") {
-      showSuccess("Login realizado com sucesso!");
-      localStorage.setItem("auth_token", "seu_token_simulado_aqui");
-      router.push("/admin/dashboard");
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      showError("Erro ao fazer login: " + error.message);
     } else {
-      showError("Credenciais inválidas. Tente novamente.");
+      showSuccess("Login realizado com sucesso!");
+      router.push("/admin/dashboard"); // Redirecionar após login bem-sucedido
     }
+    setLoading(false);
   };
 
   return (
-    // 1. Adicione 'relative' aqui no div principal
     <div className="relative min-h-screen flex items-center justify-center bg-login-bg-page p-4 bg-[url(/textile-9546497.svg)] bg-cover bg-center ">
       <div className="absolute inset-0 bg-black/20 z-0" />
 
       <Paper
         elevation={3}
         sx={{
-          // fontFamily removido daqui
           position: "relative",
           zIndex: 1,
           width: "100%",
           maxWidth: 400,
           borderRadius: "2rem",
           p: 4,
-          bgcolor: "#181c2c", // A cor do painel continua sólida
+          bgcolor: "#181c2c",
           color: "#ffffff",
           display: "flex",
           flexDirection: "column",
@@ -45,7 +51,6 @@ const LoginPage = () => {
         }}
       >
         <Typography
-          // fontFamily removido daqui
           textTransform={"uppercase"}
           variant="h5"
           fontWeight="bold"
@@ -55,7 +60,6 @@ const LoginPage = () => {
         </Typography>
 
         <Typography
-          // fontFamily removido daqui
           variant="h6"
           sx={{ mb: 3 }}
         >
@@ -77,21 +81,18 @@ const LoginPage = () => {
             variant="standard"
             sx={{
               mb: 2,
-              // fontFamily removido daqui
-              // Estilos para o input branco:
               "& .MuiInputBase-input": {
-                color: "#c7c5b0", // Cor do texto digitado
+                color: "#c7c5b0",
               },
               "& .MuiInputLabel-root": {
-                color: "rgba(255, 255, 255, 0.9)", // Cor da label
+                color: "rgba(255, 255, 255, 0.9)",
               },
               "& .MuiInput-underline:before": {
-                borderBottomColor: "#c7c5b0", // Cor da linha
+                borderBottomColor: "#c7c5b0",
               },
               "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-                borderBottomColor: "#c7c5b0", // Cor da linha ao passar o mouse
+                borderBottomColor: "#c7c5b0",
               },
-              // Cor da label e linha quando focado
               "& .MuiInput-underline:after": {
                 borderBottomColor: "#c7c5b0",
               },
@@ -114,21 +115,18 @@ const LoginPage = () => {
             variant="standard"
             sx={{
               mb: 1,
-              // fontFamily removido daqui
-              // Estilos para o input branco:
               "& .MuiInputBase-input": {
-                color: "#c7c5b0", // Cor do texto digitado
+                color: "#c7c5b0",
               },
               "& .MuiInputLabel-root": {
-                color: "rgba(255, 255, 255, 0.9)", // Cor da label
+                color: "rgba(255, 255, 255, 0.9)",
               },
               "& .MuiInput-underline:before": {
-                borderBottomColor: "#c7c5b0", // Cor da linha
+                borderBottomColor: "#c7c5b0",
               },
               "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-                borderBottomColor: "#c7c5b0", // Cor da linha ao passar o mouse
+                borderBottomColor: "#c7c5b0",
               },
-              // Cor da label e linha quando focado
               "& .MuiInput-underline:after": {
                 borderBottomColor: "#c7c5b0",
               },
@@ -141,11 +139,11 @@ const LoginPage = () => {
             type="submit"
             fullWidth
             variant="contained"
+            disabled={loading} // Desabilitar botão durante o carregamento
             sx={{
               py: 1.5,
               fontSize: "1rem",
               bgcolor: "#3f485c",
-              // fontFamily removido daqui
               color: "#ffffff",
               "&:hover": {
                 bgcolor: "#3f485c",
@@ -155,7 +153,7 @@ const LoginPage = () => {
               mt: 3,
             }}
           >
-            Entrar
+            {loading ? <CircularProgress size={24} color="inherit" /> : "Entrar"}
           </Button>
         </Box>
       </Paper>

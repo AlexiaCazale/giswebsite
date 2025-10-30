@@ -2,16 +2,20 @@
 
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { dataProjects } from "./projects-component";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Project } from "./projects-component"; // Importar a interface Project
 
 const Slider = dynamic(() => import("react-slick"), { ssr: false });
 
-function SlideComponentProjects() {
+interface SlideComponentProjectsProps {
+  slides: Project[]; // Usar a interface Project
+}
+
+function SlideComponentProjects({ slides }: SlideComponentProjectsProps) {
   const [mounted, setMounted] = useState(false);
   const [windowWidth, setWindowWidth] = useState<number>(0);
 
@@ -45,7 +49,7 @@ function SlideComponentProjects() {
   return (
     <div className="slider-container">
       <Slider {...settings}>
-        {dataProjects.map((e) => (
+        {slides.map((e) => (
           <div key={e.id}>
             <div
               className=" shadow-lg flex flex-col h-full mx-4"
@@ -53,7 +57,7 @@ function SlideComponentProjects() {
               <Link href={`/projeto/${e.id}`}>
                 <div className="relative w-full aspect-[3/4] ">
                   <Image
-                    src={e.imgUrl}
+                    src={e.cover_image || "/placeholder-project.jpeg"} // Usar cover_image
                     alt={e.alt || e.name || "Projeto"}
                     layout="fill"
                     objectFit="cover" 

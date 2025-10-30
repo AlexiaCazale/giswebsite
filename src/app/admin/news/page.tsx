@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -20,28 +20,45 @@ import {
   TableRow,
   TableContainer,
   Paper,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 import {
   AddCircleOutline as PlusCircleIcon,
   Edit as EditIcon,
   Delete as Trash2Icon,
 } from "@mui/icons-material";
-import { News, mockNews } from "@/app/lib/data";
-import { showSuccess } from "@/utils/toast";
+import { showSuccess, showError } from "@/utils/toast";
+import { supabase } from "@/integrations/supabase/client"; // Importar cliente Supabase
 
 // 1. Importe o createTheme e o ThemeProvider do MUI
 import {
   createTheme,
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
+import Link from "next/link";
+import ImageUpload from "@/app/components/admin/ImageUpload"; // Importar o novo componente
+import { v4 as uuidv4 } from "uuid"; // Importar uuid para nomes de arquivos únicos
 
-const BACKGROUND_DEFAULT = "#2b2f3d"; // Fundo geral (match AdminLayout main background)
-const BACKGROUND_PAPER = "#485164"; // Fundo de Cards/Modals/Tabelas (match Dashboard Card background)
-const TEXT_PRIMARY = "#ffffffff"; // Cor do texto principal (claro)
-const TEXT_SECONDARY = "#a0a0a0"; // Cor do texto secundário/Ícones
-const HOVER_BG = "#414857ff"; // Fundo do hover/botão neutro
-const PRIMARY_MAIN = "#181c2c"; // Cor primária (verde de destaque)
-const BORDER_COLOR = "#3c485c"; // Cor da borda/divisor
+// Interface para Notícias (ajustada para o novo esquema do DB)
+interface NewsItem {
+  id: string;
+  title: string;
+  author: string;
+  // content: string; // REMOVIDO
+  link_url?: string; // Renomeado de news_link
+  image?: string;
+  created_at: string;
+  user_id: string;
+}
+
+const BACKGROUND_DEFAULT = "#2b2f3d";
+const BACKGROUND_PAPER = "#485164";
+const TEXT_PRIMARY = "#ffffffff";
+const TEXT_SECONDARY = "#a0a0a0";
+const HOVER_BG = "#414857ff";
+const PRIMARY_MAIN = "#181c2c";
+const BORDER_COLOR = "#3c485c";
 
 
 // 2. Crie um tema local que define a fonte e as cores para o modo escuro, seguindo o padrão
@@ -136,36 +153,179 @@ const muiTheme = createTheme({
 
 
 const NewsPage = () => {
-  const [news, setNews] = useState<News[]>(mockNews);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingNews, setEditingNews] = useState<News | null>(null);
-  const [newNewsData, setNewNewsData] = useState<Omit<News, "id"> & { id?: string }>(
-    { title: "", author: "", publishDate: "", content: "" }
+  const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
+  const [newNewsData, setNewNewsData] = useState<Omit<NewsItem, "id" | "created_at" | "user_id"> & { id?: string }>(
+    { title: "", author: "", link_url: "", image: "" } // 'content' removido
   );
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [newsToDeleteId, setNewsToDeleteId] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({}); // Estado para erros do formulário
 
-  const handleAddNews = () => {
-    if (editingNews) {
-      setNews(
-        news.map((n) =>
-          n.id === editingNews.id ? { ...newNewsData, id: n.id } as News : n
-        )
-      );
-      showSuccess("Notícia atualizada com sucesso!");
+  // Estados para o ImageUpload
+  const [selectedNewFiles, setSelectedNewFiles] = useState<File[]>([]);
+  const [currentImageUrlsForUpload, setCurrentImageUrlsForUpload] = useState<
+    string[]
+  >([]);
+
+  const fetchNews = async () => {
+    setLoading(true);
+    const { data: user, error: userError } = await supabase.auth.getUser();
+    if (userError || !user?.user) {
+      showError("Você precisa estar logado para ver as notícias.");
+      setLoading(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("news")
+      .select("*")
+      .eq("user_id", user.user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      showError("Erro ao buscar notícias: " + error.message);
     } else {
-      const newId = `n${news.length + 1}`;
-      setNews([...news, { ...newNewsData, id: newId, publishDate: newNewsData.publishDate || new Date().toISOString().split('T')[0] } as News]);
-      showSuccess("Notícia adicionada com sucesso!");
+      setNews(data as NewsItem[]);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  // Função de validação
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+    if (!newNewsData.title.trim()) {
+      errors.title = "O título da notícia é obrigatório.";
+    }
+    if (!newNewsData.author.trim()) {
+      errors.author = "O autor da notícia é obrigatório.";
+    }
+    if (!newNewsData.link_url?.trim()) {
+      errors.link_url = "A URL do link é obrigatória.";
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const uploadImage = async (file: File, userId: string): Promise<string | null> => {
+    const fileExtension = file.name.split(".").pop();
+    const fileName = `${uuidv4()}.${fileExtension}`;
+    const filePath = `${userId}/${fileName}`; // Pasta por user_id
+
+    const { data, error } = await supabase.storage
+      .from("news-images") // Nome do bucket para imagens de notícias
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (error) {
+      showError("Erro ao fazer upload da imagem: " + error.message);
+      return null;
+    }
+
+    // Retorna a URL pública da imagem
+    const { data: publicUrlData } = supabase.storage
+      .from("news-images")
+      .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+  };
+
+  const handleAddOrUpdateNews = async () => {
+    if (!validateForm()) {
+      showError("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    const { data: user, error: userError } = await supabase.auth.getUser();
+    if (userError || !user?.user) {
+      showError("Você precisa estar logado para adicionar/editar notícias.");
+      return;
+    }
+
+    let imageUrl: string | null = newNewsData.image || null;
+
+    // Se houver novos arquivos selecionados, faça o upload do primeiro (apenas um para notícias)
+    if (selectedNewFiles.length > 0) {
+      const uploadedUrl = await uploadImage(selectedNewFiles[0], user.user.id);
+      if (uploadedUrl) {
+        imageUrl = uploadedUrl;
+      } else {
+        // Se o upload falhar, não continue com a operação de salvar
+        return;
+      }
+    } else if (currentImageUrlsForUpload.length > 0) {
+      // Se não houver novos arquivos, mas houver URLs existentes (que não foram removidas)
+      imageUrl = currentImageUrlsForUpload[0];
+    } else {
+      // Se não houver novos arquivos nem URLs existentes, a imagem é nula
+      imageUrl = null;
+    }
+
+    if (editingNews) {
+      const { error } = await supabase
+        .from("news")
+        .update({
+          title: newNewsData.title,
+          author: newNewsData.author,
+          // content: newNewsData.content, // REMOVIDO
+          link_url: newNewsData.link_url,
+          image: imageUrl, // Usar a URL da imagem
+        })
+        .eq("id", editingNews.id)
+        .eq("user_id", user.user.id);
+
+      if (error) {
+        showError("Erro ao atualizar notícia: " + error.message);
+      } else {
+        showSuccess("Notícia atualizada com sucesso!");
+        fetchNews();
+      }
+    } else {
+      const { error } = await supabase.from("news").insert({
+        user_id: user.user.id,
+        title: newNewsData.title,
+        author: newNewsData.author,
+        // content: newNewsData.content, // REMOVIDO
+        link_url: newNewsData.link_url,
+        image: imageUrl, // Usar a URL da imagem
+      });
+
+      if (error) {
+        showError("Erro ao adicionar notícia: " + error.message);
+      } else {
+        showSuccess("Notícia adicionada com sucesso!");
+        fetchNews();
+      }
     }
     setIsDialogOpen(false);
     setEditingNews(null);
-    setNewNewsData({ title: "", author: "", publishDate: "", content: "" });
+    setNewNewsData({ title: "", author: "", link_url: "", image: "" }); // 'content' removido
+    setSelectedNewFiles([]); // Limpar arquivos selecionados
+    setCurrentImageUrlsForUpload([]); // Limpar URLs existentes
+    setFormErrors({}); // Limpar erros do formulário
   };
 
-  const handleEditClick = (newsItem: News) => {
+  const handleEditClick = (newsItem: NewsItem) => {
     setEditingNews(newsItem);
-    setNewNewsData(newsItem);
+    setNewNewsData({
+      title: newsItem.title,
+      author: newsItem.author,
+      // content: newsItem.content, // REMOVIDO
+      link_url: newsItem.link_url || "",
+      image: newsItem.image || "",
+    });
+    // Preencher o ImageUpload com a URL existente
+    setCurrentImageUrlsForUpload(newsItem.image ? [newsItem.image] : []);
+    setSelectedNewFiles([]); // Limpar quaisquer arquivos novos pré-selecionados
+    setFormErrors({}); // Limpar erros do formulário
     setIsDialogOpen(true);
   };
 
@@ -174,10 +334,39 @@ const NewsPage = () => {
     setIsConfirmDialogOpen(true);
   };
 
-  const handleDeleteConfirmed = () => {
+  const handleDeleteConfirmed = async () => {
     if (newsToDeleteId) {
-      setNews(news.filter((newsItem) => newsItem.id !== newsToDeleteId));
-      showSuccess("Notícia excluída com sucesso!");
+      const { data: user, error: userError } = await supabase.auth.getUser();
+      if (userError || !user?.user) {
+        showError("Você precisa estar logado para excluir notícias.");
+        return;
+      }
+
+      // Opcional: Excluir imagem do storage se houver
+      const newsToDelete = news.find(n => n.id === newsToDeleteId);
+      if (newsToDelete?.image) {
+        const filePath = newsToDelete.image.split('/').slice(-2).join('/'); // Extrai 'user_id/filename.ext'
+        const { error: deleteImageError } = await supabase.storage
+          .from('news-images')
+          .remove([filePath]);
+        if (deleteImageError) {
+          console.error("Erro ao excluir imagem do storage:", deleteImageError.message);
+          // Não mostramos erro para o usuário final, pois a exclusão da notícia é mais importante
+        }
+      }
+
+      const { error } = await supabase
+        .from("news")
+        .delete()
+        .eq("id", newsToDeleteId)
+        .eq("user_id", user.user.id);
+
+      if (error) {
+        showError("Erro ao excluir notícia: " + error.message);
+      } else {
+        showSuccess("Notícia excluída com sucesso!");
+        fetchNews();
+      }
       setNewsToDeleteId(null);
       setIsConfirmDialogOpen(false);
     }
@@ -186,6 +375,8 @@ const NewsPage = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setNewNewsData((prev) => ({ ...prev, [id]: value }));
+    // Limpar erro específico ao digitar
+    setFormErrors(prev => ({ ...prev, [id]: "" }));
   };
 
   return (
@@ -206,7 +397,10 @@ const NewsPage = () => {
             startIcon={<PlusCircleIcon />}
             onClick={() => {
               setEditingNews(null);
-              setNewNewsData({ title: "", author: "", publishDate: "", content: "" });
+              setNewNewsData({ title: "", author: "", link_url: "", image: "" }); // 'content' removido
+              setSelectedNewFiles([]); // Limpar arquivos selecionados
+              setCurrentImageUrlsForUpload([]); // Limpar URLs existentes
+              setFormErrors({}); // Limpar erros do formulário
               setIsDialogOpen(true);
             }}
             // Estilo do botão neutro, usando as novas cores suaves
@@ -222,9 +416,9 @@ const NewsPage = () => {
           </Button>
 
           {/* Dialog de Adição/Edição */}
-          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+          <Dialog open={isDialogOpen} onClose={() => {setIsDialogOpen(false); setFormErrors({});}}>
 
-            <DialogTitle color="text.primary">
+            <DialogTitle color="text.primary" sx={{ bgcolor: "#666e7e" }}>
               {editingNews ? "Editar Notícia" : "Adicionar Nova Notícia"}
             </DialogTitle>
 
@@ -244,6 +438,8 @@ const NewsPage = () => {
                 value={newNewsData.title}
                 onChange={handleInputChange}
                 sx={{ mt: 2 }}
+                error={!!formErrors.title}
+                helperText={formErrors.title}
               />
               <TextField
                 margin="dense"
@@ -255,37 +451,37 @@ const NewsPage = () => {
                 value={newNewsData.author}
                 onChange={handleInputChange}
                 sx={{ mt: 2 }}
+                error={!!formErrors.author}
+                helperText={formErrors.author}
               />
               <TextField
                 margin="dense"
-                id="publishDate"
-                label="Data de Publicação"
-                type="date"
+                id="link_url"
+                label="URL do Link"
+                type="url"
                 fullWidth
                 variant="outlined"
-                InputLabelProps={{ shrink: true }}
-                value={newNewsData.publishDate}
+                value={newNewsData.link_url}
                 onChange={handleInputChange}
                 sx={{ mt: 2 }}
+                error={!!formErrors.link_url}
+                helperText={formErrors.link_url}
               />
-              <TextField
-                margin="dense"
-                id="content"
-                label="Conteúdo"
-                multiline
-                rows={4}
-                fullWidth
-                variant="outlined"
-                value={newNewsData.content}
-                onChange={handleInputChange}
-                sx={{ mt: 2 }}
+              {/* Componente ImageUpload para uma única imagem */}
+              <ImageUpload
+                label="Imagem de Capa"
+                initialImageUrls={currentImageUrlsForUpload}
+                onImageUrlsChange={setCurrentImageUrlsForUpload}
+                onNewFilesChange={setSelectedNewFiles}
+                multiple={false} // Apenas uma imagem para capa
               />
+              {/* TextField de Conteúdo REMOVIDO */}
             </DialogContent>
 
-            <DialogActions>
-              <Button onClick={() => setIsDialogOpen(false)} color="inherit" sx={{ color: TEXT_PRIMARY }}>Cancelar</Button>
+            <DialogActions sx={{ bgcolor: "#666e7e" }}>
+              <Button onClick={() => {setIsDialogOpen(false); setFormErrors({});}} color="inherit" sx={{ color: TEXT_PRIMARY }}>Cancelar</Button>
               <Button
-                onClick={handleAddNews}
+                onClick={handleAddOrUpdateNews}
                 variant="contained"
                 // Botão de salvar com estilo neutro/suave
                 sx={{
@@ -306,7 +502,18 @@ const NewsPage = () => {
         <Card sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}>
           <CardHeader title={<Typography variant="h6" color="text.primary">Lista de Notícias</Typography>} />
           <CardContent>
-            {news.length === 0 ? (
+            {loading ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  minHeight: 200,
+                }}
+              >
+                <CircularProgress sx={{ color: TEXT_PRIMARY }} />
+              </Box>
+            ) : news.length === 0 ? (
               <Typography color="text.secondary">
                 Nenhuma notícia encontrada.
               </Typography>
@@ -323,9 +530,9 @@ const NewsPage = () => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      {/* TableCell Head usa o HOVER_BG definido em muiTheme.components */}
                       <TableCell>Título</TableCell>
                       <TableCell>Autor</TableCell>
+                      <TableCell>Link</TableCell>
                       <TableCell>Data de Publicação</TableCell>
                       <TableCell align="right">Ações</TableCell>
                     </TableRow>
@@ -344,7 +551,12 @@ const NewsPage = () => {
                           {newsItem.title}
                         </TableCell>
                         <TableCell>{newsItem.author}</TableCell>
-                        <TableCell>{newsItem.publishDate}</TableCell>
+                        <TableCell>
+                          <Link href={newsItem.link_url || "#"} target="_blank" rel="noopener noreferrer" style={{ color: TEXT_PRIMARY, textDecoration: 'underline' }}>
+                            {newsItem.link_url ? "Ver Notícia" : "N/A"}
+                          </Link>
+                        </TableCell>
+                        <TableCell>{new Date(newsItem.created_at).toLocaleDateString()}</TableCell>
                         <TableCell align="right">
                           <Button
                             variant="text"
@@ -371,13 +583,13 @@ const NewsPage = () => {
                             aria-labelledby="alert-dialog-title"
                             aria-describedby="alert-dialog-description"
                           >
-                            <DialogTitle id="alert-dialog-title" color="text.primary">{"Tem certeza?"}</DialogTitle>
+                            <DialogTitle id="alert-dialog-title" color="text.primary" sx={{ bgcolor: "#666e7e" }}>{"Tem certeza?"}</DialogTitle>
                             <DialogContent>
                               <DialogContentText id="alert-dialog-description" color="text.secondary">
                                 Esta ação não pode ser desfeita. Isso excluirá permanentemente a notícia.
                               </DialogContentText>
                             </DialogContent>
-                            <DialogActions>
+                            <DialogActions sx={{ bgcolor: "#666e7e" }}>
                               <Button onClick={() => setIsConfirmDialogOpen(false)} color="inherit" sx={{ color: TEXT_SECONDARY }}>Cancelar</Button>
                               <Button onClick={handleDeleteConfirmed} autoFocus variant="contained" color="error">
                                 Continuar

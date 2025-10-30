@@ -1,73 +1,63 @@
-import Masonry from "@/components/Masonry";
-import PixelTransition from "@/components/PixelTransition";
-import Image from "next/image";
-import React from "react";
-import SlideComponent from "./slide-component";
+"use client";
 
-export const membersList = [
-  {
-    id: 0,
-    name: "Aléxia Cazale",
-    description: "Estudante",
-    imgUrl: "/members/alexia.jpeg",
-  },
-  {
-    id: 1,
-    name: "Julia Mazoti",
-    description: "Estudante",
-    imgUrl: "/members/julia.jpeg",
-  },
-  {
-    id: 2,
-    name: "Letícia Garcia",
-    description: "Estudante",
-    imgUrl: "/members/leticia.jpeg",
-  },
-  {
-    id: 3,
-    name: "Geovana Cristina",
-    description: "Estudante",
-    imgUrl: "/members/geovana.jpeg",
-  },
-  {
-    id: 4,
-    name: "Evelyn Cassinotte",
-    description: "Estudante",
-    imgUrl: "/members/evelyn.jpeg",
-  },
-  {
-    id: 5,
-    name: "Rayssa Maely",
-    description: "Estudante",
-    imgUrl: "/members/rayssa.jpeg",
-  },
-  {
-    id: 6,
-    name: "Yasmin Sanchez",
-    description: "Estudante",
-    imgUrl: "/members/yasmin.jpeg",
-  },
-  {
-    id: 7,
-    name: "Brenda Ananias",
-    description: "Estudante",
-    imgUrl: "/members/brenda.jpeg",
-  },
-  {
-    id: 8,
-    name: "Arthur Henrique",
-    description: "Estudante",
-    imgUrl: "/members/arthur.jpeg",
-  },
-  {
-    id: 9,
-    name: "Jorge Guilherme",
-    description: "Estudante",
-    imgUrl: "/members/jorge.jpeg",
-  },
-];
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
+import SlideComponent, { ISlide } from "./slide-component";
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
+
+// Hardcoded Professor Cida data
+const cidaMember: ISlide = {
+  id: "cida-zem", // Unique ID for Cida
+  name: "Profª Dra. Aparecia Zem Lopes",
+  description: "Nossa Guia e Inspiração",
+  imgUrl: "/members/cida.jpeg",
+  alt: "Profª Cida Zem",
+};
+
+// Interface for Supabase member data
+interface SupabaseMember {
+  id: string;
+  name: string;
+  function: string; // Corresponds to 'description' in ISlide
+  image?: string; // Corresponds to 'imgUrl' in ISlide
+  created_at: string;
+  user_id: string;
+}
 
 export default function Member() {
+  const [membersList, setMembersList] = useState<ISlide[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("members")
+        .select("id, name, function, image")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        showError("Erro ao buscar membros: " + error.message);
+        setMembersList([cidaMember]); // Fallback to only Cida if fetch fails
+      } else {
+        const fetchedSlides: ISlide[] = data
+          .filter((member: SupabaseMember) => member.name !== cidaMember.name) // Ensure Cida is not duplicated if she's in DB
+          .map((member: SupabaseMember) => ({
+            id: member.id,
+            name: member.name,
+            description: member.function,
+            imgUrl: member.image || "/members/default.jpeg", // Use a default image if none is provided
+            alt: member.name,
+          }));
+        setMembersList([cidaMember, ...fetchedSlides]);
+      }
+      setLoading(false);
+    };
+
+    fetchMembers();
+  }, []);
+
   return (
     <React.Fragment>
       <div className="flex bg-[#f2e4db] w-[100%] h-[100%] xl:w-screen p-[30px] md:px-16" id="membros">
@@ -92,8 +82,8 @@ export default function Member() {
             <div className="flex flex-col xl:flex-row items-center gap-4 md:gap-10">
               <div className="bg-[#a45944] rounded-full p-1 w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] md:w-[280px] md:h-[280px]">
                 <Image
-                  src={"/members/cida.jpeg"}
-                  alt={"Profª Cida Zem"}
+                  src={cidaMember.imgUrl}
+                  alt={cidaMember.alt || cidaMember.name}
                   width={280}
                   height={280}
                   className="rounded-[50%] w-full h-full object-cover"
@@ -102,9 +92,9 @@ export default function Member() {
               </div>
 
               <div className="flex-col text-center xl:text-start max-w-lg">
-                <p className="mt-2 font-bold text-lg md:text-xl">Profª Dra. Aparecia Zem Lopes</p>
+                <p className="mt-2 font-bold text-lg md:text-xl">{cidaMember.name}</p>
                 <span className="text-sm font-medium block mt-1">
-                  Nossa Guia e Inspiração
+                  {cidaMember.description}
                 </span>
                 <p className="mt-2 text-sm leading-relaxed">
                   Com sabedoria e dedicação, a Profª Cida não apenas orienta este projeto,
@@ -113,11 +103,16 @@ export default function Member() {
                 </p>
               </div>
             </div>
-            <SlideComponent slides={membersList} />
+            {loading ? (
+              <div className="flex justify-center items-center h-40">
+                <p className="text-gray-600">Carregando membros...</p>
+              </div>
+            ) : (
+              <SlideComponent slides={membersList.filter(member => member.id !== cidaMember.id)} />
+            )}
           </div>
         </div>
       </div>
-      {/* </div> */}
     </React.Fragment>
   );
 }

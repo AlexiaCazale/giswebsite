@@ -1,47 +1,47 @@
 "use client";
 
-import * as React from "react"; // Esta é a linha corrigida
+import * as React from "react";
 import Image from "next/image";
-import Link from "next/link"; // Importe o Link
+import Link from "next/link";
 import SlideComponentNews from "./slider-news-component";
+import { supabase } from "@/integrations/supabase/client"; // Importar cliente Supabase
+import { showError } from "@/utils/toast"; // Importar showError
 
-// Dados Fictícios (Mock)
-// new-component.jsx - Exemplo com mais dados
-
-export const mockNewsData = [
-  {
-    id: "1",
-    imgUrl: "/news/mulheresnaciencia.png",
-    alt: "Mulheres na Ciência",
-    linkUrl: "/noticias/mulheres-na-ciencia",
-  },
-  {
-    id: "2",
-    imgUrl: "/news/Mulheres-Cientistas.png",
-    alt: "ETECs e FATECs",
-    linkUrl: "/noticias/etecs-e-fatecs",
-  },
-  {
-    id: "3",
-    imgUrl: "/news/tomates.png",
-    alt: "Professores FATEC Jahu",
-    linkUrl: "/noticias/professores-fatec-jahu",
-  },
-  {
-    id: "4", // NOVO
-    imgUrl: "/news/noticia-exemplo-4.jpg",
-    alt: "Exemplo Notícia 4",
-    linkUrl: "/noticias/exemplo-4",
-  },
-  {
-    id: "5", // NOVO
-    imgUrl: "/news/noticia-exemplo-5.jpg",
-    alt: "Exemplo Notícia 5",
-    linkUrl: "/noticias/exemplo-5",
-  },
-];
+// Interface para Notícias (ajustada para o novo esquema do DB)
+interface NewsItem {
+  id: string;
+  title: string;
+  author: string;
+  link_url?: string;
+  image?: string;
+  created_at: string;
+  user_id: string;
+}
 
 export default function NewsPage() {
+  const [newsList, setNewsList] = React.useState<NewsItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchNews = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("news")
+        .select("id, title, author, link_url, image, created_at")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        showError("Erro ao buscar notícias: " + error.message);
+        setNewsList([]); // Fallback para lista vazia em caso de erro
+      } else {
+        setNewsList(data as NewsItem[]);
+      }
+      setLoading(false);
+    };
+
+    fetchNews();
+  }, []);
+
   return (
     <React.Fragment>
       <div
@@ -55,9 +55,17 @@ export default function NewsPage() {
           <p className="text-center text-white md:text-start">Saiba onde foi nossa última aparição.</p>
         </div>
 
-
-        <SlideComponentNews />
-
+        {loading ? (
+          <div className="flex justify-center items-center h-40">
+            <p className="text-white">Carregando notícias...</p>
+          </div>
+        ) : newsList.length === 0 ? (
+          <div className="flex justify-center items-center h-40">
+            <p className="text-white">Nenhuma notícia encontrada.</p>
+          </div>
+        ) : (
+          <SlideComponentNews slides={newsList} />
+        )}
       </div>
     </React.Fragment>
   );

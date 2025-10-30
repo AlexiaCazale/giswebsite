@@ -15,6 +15,7 @@ import {
   Typography,
   Divider,
   IconButton,
+  CircularProgress, // Importar CircularProgress para o estado de carregamento
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -27,7 +28,10 @@ import {
 import { useIsMobile } from "../hooks/use-mobile";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react"; // Importar useState
+import { Session } from "@supabase/supabase-js"; // Importar Session type
+import { supabase } from "@/integrations/supabase/client"; // Importar cliente Supabase
+import { showError } from "@/utils/toast"; // Importar showError
 
 // 1. Importe os provedores de tema
 import {
@@ -47,7 +51,7 @@ const TEXT_SECONDARY = "#a0a0a0"; // Texto secundário/Ícones normais (cinza m�
 const PRIMARY_MAIN = "#ffffffff"; // Um verde mais vibrante para a cor primária
 const SELECTED_BG = "#1e202aff"; // Fundo do item selecionado no Drawer (azul escuro um pouco mais claro)
 const HOVER_BG = "#1e202aff"; // Fundo do item em hover no Drawer (azul escuro)
-const BORDER_COLOR = "#3c485c"; // Cor da borda/divisor (azul acinzentado)
+const BORDER_COLOR = "#3c485c"; // Cor da borda/divisor
 
 // 2. Crie seu tema MUI global aqui - TEMA ESCURO MAIS SUAVE 🎨
 const muiTheme = createTheme({
@@ -70,61 +74,65 @@ const muiTheme = createTheme({
   },
 });
 
-
-const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    if (token) {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, []);
-
-  return { isAuthenticated, isLoading };
-};
-
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const isMobile = useIsMobile();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const pathname = usePathname();
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
-
+  
   const LOGIN_PATH = "/admin";
+  const DASHBOARD_PATH = "/admin/dashboard";
   const isLoginPage = pathname === LOGIN_PATH;
 
   useEffect(() => {
-    // if (isLoading) return;
-    // if (!isAuthenticated && !isLoginPage) {
-    //   router.push(LOGIN_PATH);
-    // }
-    if (isAuthenticated && isLoginPage) {
-      router.push("/admin/dashboard");
-    }
-  }, [isAuthenticated, isLoading, isLoginPage, router]);
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, currentSession) => {
+        setSession(currentSession);
+        setLoading(false);
+
+        if (event === 'SIGNED_OUT' || !currentSession) {
+          if (!isLoginPage) {
+            router.push(LOGIN_PATH);
+          }
+        } else if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+          if (isLoginPage) {
+            router.push(DASHBOARD_PATH);
+          }
+        }
+      }
+    );
+
+    // Cleanup the subscription on component unmount
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [isLoginPage, router]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
   const navItems = [
-    { text: "Dashboard", icon: <DashboardIcon />, path: "/admin/dashboard" },
+    { text: "Dashboard", icon: <DashboardIcon />, path: DASHBOARD_PATH },
     { text: "Projetos", icon: <FolderIcon />, path: "/admin/projects" },
     { text: "Notícias", icon: <NewspaperIcon />, path: "/admin/news" },
     { text: "Membros", icon: <GroupIcon />, path: "/admin/members" },
   ];
 
-  const handleLogout = () => {
-    localStorage.removeItem("auth_token");
-    router.push("/");
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      showError("Erro ao fazer logout: " + error.message);
+    } else {
+      router.push(LOGIN_PATH);
+    }
   };
 
   // 3. Use os provedores reais em vez do wrapper
-  if (isLoading) {
+  if (loading) {
     return (
       <NextThemesProvider forcedTheme="dark" attribute="class"> {/* Força tema escuro no loading */}
         <MuiThemeProvider theme={muiTheme}>
@@ -139,11 +147,18 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               color: TEXT_PRIMARY,
             }}
           >
-            <p>Verificando autenticação...</p>
+            <CircularProgress sx={{ color: TEXT_PRIMARY }} />
+            <Typography variant="h6" sx={{ ml: 2 }}>Verificando autenticação...</Typography>
           </div>
         </MuiThemeProvider>
       </NextThemesProvider>
     );
+  }
+
+  if (!session && !isLoginPage) {
+    // Se não autenticado e não na página de login, redirecionar para login
+    // O useEffect já cuida do push, mas este return evita renderizar o conteúdo
+    return null; 
   }
 
   if (isLoginPage) {

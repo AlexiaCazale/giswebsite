@@ -3,19 +3,23 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import SlideComponentProjects from "./slide-component-projects";
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
 
-export interface Project {
+// Interface para Projetos (ajustada para o novo esquema do DB)
+export interface ProjectDetailItem {
   id: number;
   name: string;
   description: string;
-  src: string;
-  alt: string;
-  height?: number;
-  gallery?: { id: string; img: string; height: number }[];
+  cover_image?: string;
+  images?: string; // JSON string of string[] for gallery
+  created_at: string;
+  user_id: string;
 }
 
 interface ProjectDetailsProps {
-  project: Project;
+  projectId: number; // Recebe apenas o ID do projeto
 }
 
 function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
@@ -23,15 +27,55 @@ function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
   console.info("You clicked a breadcrumb.");
 }
 
-export default function ProjectDetails({ project }: ProjectDetailsProps) {
+const mockProjectDetails = {
+  id: 1,
+  name: "Inteligência Artificial",
+  description:
+    "Este projeto explora o desenvolvimento e aplicação de inteligência artificial para resolver problemas complexos. Focamos em algoritmos de aprendizado de máquina e redes neurais para criar soluções inovadoras em diversas áreas.",
+  cover_image: "/projects/ia-capa.jpeg",
+  images: JSON.stringify([
+    "/projects/IA/20241011_140610.jpg",
+    "/projects/IA/20241011_142241.jpg",
+    "/projects/IA/20241011_144416.jpg",
+  ]),
+  created_at: "2023-01-01T00:00:00Z",
+  user_id: "mock-user-id",
+};
 
-  const items =
-    project.gallery?.map((g) => ({
-      id: g.id,
-      img: g.img,
-      url: g.img,
-      height: g.height,
-    })) ?? [];
+export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
+  const [project, setProject] = useState<ProjectDetailItem | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Revertendo para dados mockados
+    setProject(mockProjectDetails);
+    setLoading(false);
+  }, [projectId]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-4 w-full min-h-screen p-[30px] md:px-16 bg-[#1a1a1a] text-white items-center justify-center">
+        <Typography variant="h6" color="white">Carregando projeto...</Typography>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="flex flex-col gap-4 w-full min-h-screen p-[30px] md:px-16 bg-[#1a1a1a] text-white items-center justify-center">
+        <Typography variant="h6" color="white">Projeto não encontrado.</Typography>
+      </div>
+    );
+  }
+
+  // Parsear a string JSON de imagens para o formato esperado pelo Masonry
+  const galleryImages = project.images ? JSON.parse(project.images) : [];
+  const items = galleryImages.map((imgUrl: string, index: number) => ({
+    id: `${project.id}-${index}`,
+    img: imgUrl,
+    url: imgUrl, // Link para a própria imagem em tamanho real
+    height: Math.floor(Math.random() * (500 - 300 + 1)) + 300, // Altura aleatória para layout
+  }));
 
   return (
     <div className="flex flex-col gap-4 w-full min-h-screen p-[30px] md:px-16 bg-[#1a1a1a] text-white items-center justify-center">
@@ -54,19 +98,21 @@ export default function ProjectDetails({ project }: ProjectDetailsProps) {
         </div>
       </div>
 
-      <div className="w-full max-w-6xl h-auto mb-8">
-        <Masonry
-          items={items}
-          ease="power3.out"
-          duration={0.6}
-          stagger={0.05}
-          animateFrom="bottom"
-          scaleOnHover={true}
-          hoverScale={0.95}
-          blurToFocus={true}
-          colorShiftOnHover={false}
-        />
-      </div>
+      {items.length > 0 && (
+        <div className="w-full max-w-6xl h-auto mb-8">
+          <Masonry
+            items={items}
+            ease="power3.out"
+            duration={0.6}
+            stagger={0.05}
+            animateFrom="bottom"
+            scaleOnHover={true}
+            hoverScale={0.95}
+            blurToFocus={true}
+            colorShiftOnHover={false}
+          />
+        </div>
+      )}
 
       <div className="w-full max-w-6xl">
         <div className="flex flex-col w-full justify-center items-center">
@@ -78,7 +124,7 @@ export default function ProjectDetails({ project }: ProjectDetailsProps) {
           </div>
           <div className="flex justify-center mb-4">
             <button className="px-6 py-2 border border-white rounded-lg hover:bg-white hover:text-black transition-colors">
-              <Link href="/#projects">Voltar para projetos</Link>
+              <Link href="/#projetos">Voltar para projetos</Link>
             </button>
           </div>
         </div>

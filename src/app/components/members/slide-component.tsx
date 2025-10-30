@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 const Slider = dynamic(() => import("react-slick"), { ssr: false });
 
 export interface ISlide {
-  id: number;
+  id: string; // Changed from number to string
   name: string;
   description: string;
   imgUrl: string;
