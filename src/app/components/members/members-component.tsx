@@ -15,14 +15,12 @@ const cidaMember: ISlide = {
   alt: "Profª Cida Zem",
 };
 
-// Interface for Supabase member data
+// Interface for Supabase member data (corrigida para corresponder à query)
 interface SupabaseMember {
   id: string;
   name: string;
   function: string; // Corresponds to 'description' in ISlide
   image?: string; // Corresponds to 'imgUrl' in ISlide
-  created_at: string;
-  user_id: string;
 }
 
 export default function Member() {
