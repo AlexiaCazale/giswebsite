@@ -2,11 +2,11 @@ import Masonry from "@/components/Masonry";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import SlideComponentProjects from "./slide-component-projects";
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError } from "@/utils/toast";
-import { dataProjects } from "./projects-component";
+import { Project } from "./projects-component";
+import DynamicSlider, { SlideItem } from "../shared/DynamicSlider";
 
 // Interface para Projetos (ajustada para o novo esquema do DB)
 export interface ProjectDetailItem {
@@ -28,29 +28,86 @@ function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
   console.info("You clicked a breadcrumb.");
 }
 
-const mockProjectDetails = {
-  id: 1,
-  name: "Inteligência Artificial",
-  description:
-    "Este projeto explora o desenvolvimento e aplicação de inteligência artificial para resolver problemas complexos. Focamos em algoritmos de aprendizado de máquina e redes neurais para criar soluções inovadoras em diversas áreas.",
-  cover_image: "/projects/ia-capa.jpeg",
-  images: JSON.stringify([
-    "/projects/IA/20241011_140610.jpg",
-    "/projects/IA/20241011_142241.jpg",
-    "/projects/IA/20241011_144416.jpg",
-  ]),
-  created_at: "2023-01-01T00:00:00Z",
-  user_id: "mock-user-id",
-};
-
 export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
   const [project, setProject] = useState<ProjectDetailItem | null>(null);
+  const [otherProjects, setOtherProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [projectsList, setProjectsList] = useState<Project[]>([]);
 
   useEffect(() => {
-    // Revertendo para dados mockados
-    setProject(mockProjectDetails);
-    setLoading(false);
+    const fetchProjects = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("projects")
+        .select("id, name, description, cover_image")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        showError("Erro ao buscar projetos: " + error.message);
+        setProjectsList([]);
+      } else {
+        const formattedProjects: Project[] = data.map((p) => ({
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          cover_image: p.cover_image,
+          alt: p.name,
+        }));
+        setProjectsList(formattedProjects);
+      }
+      setLoading(false);
+    };
+
+    fetchProjects();
+  }, []);
+
+  useEffect(() => {
+    if (!projectId) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchProjectData = async () => {
+      setLoading(true);
+
+      // Fetch the main project
+      const { data: projectData, error: projectError } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("id", projectId)
+        .single();
+
+      if (projectError) {
+        showError("Erro ao buscar detalhes do projeto: " + projectError.message);
+        setProject(null);
+      } else {
+        setProject(projectData as ProjectDetailItem);
+      }
+
+      // Fetch all other projects for the slider
+      const { data: allProjectsData, error: allProjectsError } = await supabase
+        .from("projects")
+        .select("id, name, description, cover_image")
+        .neq("id", projectId)
+        .order("created_at", { ascending: false });
+
+      if (allProjectsError) {
+        showError("Erro ao buscar outros projetos: " + allProjectsError.message);
+      } else {
+        const formattedProjects: Project[] = allProjectsData.map((p) => ({
+          id: p.id,
+          name: p.name,
+          description: p.description,
+          cover_image: p.cover_image,
+          alt: p.name,
+        }));
+        setOtherProjects(formattedProjects);
+      }
+
+      setLoading(false);
+    };
+
+    fetchProjectData();
   }, [projectId]);
 
   if (loading) {
@@ -76,6 +133,14 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
     img: imgUrl,
     url: imgUrl, // Link para a própria imagem em tamanho real
     height: Math.floor(Math.random() * (500 - 300 + 1)) + 300, // Altura aleatória para layout
+  }));
+
+
+  const slides: SlideItem[] = projectsList.map(project => ({
+    id: project.id,
+    title: project.name,
+    linkUrl: `/projeto/${project.id}`,
+    imageUrl: project.cover_image || "/placeholder-project.jpeg",
   }));
 
   return (
@@ -121,7 +186,7 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
             Veja outros projetos
           </h1>
           <div className="w-[100%] py-10">
-            <SlideComponentProjects slides={dataProjects} />
+            <DynamicSlider slides={slides} showButton={false} />
           </div>
           <div className="flex justify-center mb-4">
             <button className="px-6 py-2 border border-white rounded-lg hover:bg-white hover:text-black transition-colors">

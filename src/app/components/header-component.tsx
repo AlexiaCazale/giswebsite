@@ -23,7 +23,7 @@ export default function HeaderComponent() {
       </div>
 
       <nav
-        className={`md:flex ${
+        className={`lg:flex ${
           openMenu
             ? "flex-col absolute items-center top-[60px] h-[100vh] left-0 w-[100%] bg-gradient-to-r bg-white text-black p-2"
             : "hidden"
@@ -53,7 +53,7 @@ export default function HeaderComponent() {
       </nav>
 
       <button
-        className="block md:hidden"
+        className="block lg:hidden"
         onClick={() => setOpenMenu(!openMenu)}
       >
         <FaBars />

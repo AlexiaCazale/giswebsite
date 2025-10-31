@@ -1,13 +1,11 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import SlideComponentNews from "./slider-news-component";
-import { supabase } from "@/integrations/supabase/client"; // Importar cliente Supabase
-import { showError } from "@/utils/toast"; // Importar showError
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
+import DynamicSlider, { SlideItem } from "../shared/DynamicSlider";
 
-// Interface para Notícias (ajustada para o novo esquema do DB)
+// Interface para Notícias
 interface NewsItem {
   id: string;
   title: string;
@@ -32,7 +30,7 @@ export default function NewsPage() {
 
       if (error) {
         showError("Erro ao buscar notícias: " + error.message);
-        setNewsList([]); // Fallback para lista vazia em caso de erro
+        setNewsList([]);
       } else {
         setNewsList(data as NewsItem[]);
       }
@@ -41,6 +39,14 @@ export default function NewsPage() {
 
     fetchNews();
   }, []);
+
+  // Map news to the format expected by DynamicSlider
+  const slides: SlideItem[] = newsList.map(news => ({
+    id: news.id,
+    title: news.title,
+    linkUrl: news.link_url || "#",
+    imageUrl: news.image,
+  }));
 
   return (
     <React.Fragment>
@@ -64,7 +70,7 @@ export default function NewsPage() {
             <p className="text-white">Nenhuma notícia encontrada.</p>
           </div>
         ) : (
-          <SlideComponentNews slides={newsList} />
+          <DynamicSlider slides={slides} showButton={true} />
         )}
       </div>
     </React.Fragment>
