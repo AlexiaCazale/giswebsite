@@ -24,6 +24,7 @@ import {
   Newspaper as NewspaperIcon,
   Group as GroupIcon,
   Logout as LogoutIcon,
+  Email as EmailIcon,
 } from "@mui/icons-material";
 import { useIsMobile } from "../hooks/use-mobile";
 import { usePathname } from "next/navigation";
@@ -120,6 +121,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     { text: "Projetos", icon: <FolderIcon />, path: "/admin/projects" },
     { text: "Notícias", icon: <NewspaperIcon />, path: "/admin/news" },
     { text: "Membros", icon: <GroupIcon />, path: "/admin/members" },
+    { text: "Mensagens", icon: <EmailIcon />, path: "/admin/messages" },
   ];
 
   const handleLogout = async () => {
