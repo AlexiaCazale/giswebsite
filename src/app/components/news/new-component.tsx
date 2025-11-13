@@ -51,7 +51,7 @@ export default function NewsPage() {
   return (
     <React.Fragment>
       <div
-        className="relative flex flex-col min-h-screen w-full p-8 md:p-16 justify-center items-center bg-[#3f485c]"
+        className="relative flex flex-col min-h-screen w-full p-8 md:p-16 justify-center items-center bg-[#6d6498]"
         id="noticias"
       >
         <div className="absolute inset-0 bg-black/20 z-0" />

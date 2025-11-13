@@ -142,7 +142,7 @@ export default function SearchResult() {
   return (
     <React.Fragment>
       <div
-        className="flex flex-col bg-[#F9F4F4] w-screen h-screen p-[30px] py-[0px 20px] md:px-16 justify-center items-center pt-20"
+        className="flex flex-col bg-[#F9F4F4] w-screen md:h-screen p-[30px] py-[0px 20px] md:px-16 justify-center items-center pt-20"
         id="resultados"
       >
         {/* Título e Subtítulo - Agora no topo */}

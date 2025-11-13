@@ -64,7 +64,7 @@ export default function FatecJahu() {
             <div className="w-full md:hidden">
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="flex items-center justify-center w-full px-4 py-3 mt-2 font-semibold text-black bg-[#fff3c6] rounded-lg shadow-md hover:bg-opacity-90 transition-colors"
+                className="flex items-center justify-center w-full px-4 py-3 mt-2 bg-[#fff3c6] p-5 rounded-[1.5rem]"
               >
                 <span>{isExpanded ? "Ocultar Cursos" : "Ver Cursos Oferecidos"}</span>
                 {isExpanded ? <ExpandLess className="ml-2" /> : <ExpandMore className="ml-2" />}
@@ -79,10 +79,10 @@ export default function FatecJahu() {
                   : "max-h-0 opacity-0"
               }`}
             >
-              <div className="grid w-[100%] gap-4 grid-cols-[repeat(auto-fit,minmax(300px,1fr))] pt-4">
+              <div className="grid items-center w-[100%] gap-4 grid-cols-[repeat(auto-fit,minmax(300px,1fr))] pt-4">
                 {data.map((e, i) => (
                   <div className="min-h-[60px] max-h-[90px]" key={i}>
-                    <div className="bg-[#fff3c6] p-5 rounded-[1.5rem]">
+                    <div className="bg-[#fff3c6] p-5 rounded-[1rem]">
                       {e}
                     </div>
                   </div>
