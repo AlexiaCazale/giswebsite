@@ -33,7 +33,7 @@ export default function Member() {
       const { data, error } = await supabase
         .from("members")
         .select("id, name, function, image")
-        .order("created_at", { ascending: false });
+        .order("display_order", { ascending: true });
 
       if (error) {
         showError("Erro ao buscar membros: " + error.message);

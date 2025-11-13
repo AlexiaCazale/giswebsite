@@ -11,14 +11,13 @@ import Member from "./components/members/members-component";
 import Contact from "./components/contact/contact-component";
 import FooterComponent from "./components/footer-component";
 import HeaderComponent from "./components/header-component";
-import { ParallaxProvider } from "react-scroll-parallax";
 import Projects from "./components/projects/projects-component";
 import Welcome from "./components/welcome/welcome-component";
 import News from "./components/news/new-component";
+import ScrollToTopButton from "./components/scroll-button";
 
 export default function Home() {
   return (
-    <ParallaxProvider>
       <div className="bg-[#1a1a1a]">
         <HeaderComponent />
         <Welcome />
@@ -29,8 +28,8 @@ export default function Home() {
         <SearchResult />
         <Member />
         <Contact />
+        <ScrollToTopButton/>
         <FooterComponent />
       </div>
-    </ParallaxProvider>
   );
 }

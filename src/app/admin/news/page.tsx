@@ -22,11 +22,14 @@ import {
   Paper,
   CircularProgress,
   Box,
+  IconButton,
 } from "@mui/material";
 import {
   AddCircleOutline as PlusCircleIcon,
   Edit as EditIcon,
   Delete as Trash2Icon,
+  ArrowUpward as ArrowUpwardIcon,
+  ArrowDownward as ArrowDownwardIcon,
 } from "@mui/icons-material";
 import { showSuccess, showError } from "@/utils/toast";
 import { supabase } from "@/integrations/supabase/client"; // Importar cliente Supabase
@@ -45,11 +48,11 @@ interface NewsItem {
   id: string;
   title: string;
   author: string;
-  // content: string; // REMOVIDO
-  link_url?: string; // Renomeado de news_link
+  link_url?: string;
   image?: string;
   created_at: string;
   user_id: string;
+  display_order: number;
 }
 
 const BACKGROUND_DEFAULT = "#2b2f3d";
@@ -157,7 +160,7 @@ const NewsPage = () => {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingNews, setEditingNews] = useState<NewsItem | null>(null);
-  const [newNewsData, setNewNewsData] = useState<Omit<NewsItem, "id" | "created_at" | "user_id"> & { id?: string }>(
+  const [newNewsData, setNewNewsData] = useState<Omit<NewsItem, "id" | "created_at" | "user_id" | "display_order"> & { id?: string }>(
     { title: "", author: "", link_url: "", image: "" } // 'content' removido
   );
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -183,7 +186,7 @@ const NewsPage = () => {
       .from("news")
       .select("*")
       .eq("user_id", user.user.id)
-      .order("created_at", { ascending: false });
+      .order("display_order", { ascending: true });
 
     if (error) {
       showError("Erro ao buscar notícias: " + error.message);
@@ -289,13 +292,28 @@ const NewsPage = () => {
         fetchNews();
       }
     } else {
+      const { data: maxOrderData, error: maxOrderError } = await supabase
+        .from('news')
+        .select('display_order')
+        .eq('user_id', user.user.id)
+        .order('display_order', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (maxOrderError && maxOrderError.code !== 'PGRST116') {
+        showError("Erro ao determinar a ordem da nova notícia.");
+        return;
+      }
+
+      const newOrder = (maxOrderData?.display_order || 0) + 1;
+
       const { error } = await supabase.from("news").insert({
         user_id: user.user.id,
         title: newNewsData.title,
         author: newNewsData.author,
-        // content: newNewsData.content, // REMOVIDO
         link_url: newNewsData.link_url,
-        image: imageUrl, // Usar a URL da imagem
+        image: imageUrl,
+        display_order: newOrder,
       });
 
       if (error) {
@@ -377,6 +395,35 @@ const NewsPage = () => {
     setNewNewsData((prev) => ({ ...prev, [id]: value }));
     // Limpar erro específico ao digitar
     setFormErrors(prev => ({ ...prev, [id]: "" }));
+  };
+
+  const handleMove = async (newsId: string, direction: 'up' | 'down') => {
+    const newsIndex = news.findIndex(n => n.id === newsId);
+    if (newsIndex === -1) return;
+
+    const newsItem = news[newsIndex];
+    const neighborIndex = direction === 'up' ? newsIndex - 1 : newsIndex + 1;
+
+    if (neighborIndex < 0 || neighborIndex >= news.length) return;
+
+    const neighbor = news[neighborIndex];
+
+    const { error: newsUpdateError } = await supabase
+      .from('news')
+      .update({ display_order: neighbor.display_order })
+      .eq('id', newsItem.id);
+
+    const { error: neighborUpdateError } = await supabase
+      .from('news')
+      .update({ display_order: newsItem.display_order })
+      .eq('id', neighbor.id);
+
+    if (newsUpdateError || neighborUpdateError) {
+      showError("Erro ao reordenar notícia.");
+    } else {
+      showSuccess("Notícia reordenada.");
+      fetchNews();
+    }
   };
 
   return (
@@ -530,15 +577,15 @@ const NewsPage = () => {
                 <Table>
                   <TableHead>
                     <TableRow>
+                      <TableCell>Ordem</TableCell>
                       <TableCell>Título</TableCell>
                       <TableCell>Autor</TableCell>
                       <TableCell>Link</TableCell>
-                      <TableCell>Data de Publicação</TableCell>
                       <TableCell align="right">Ações</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {news.map((newsItem) => (
+                    {news.map((newsItem, index) => (
                       <TableRow
                         key={newsItem.id}
                         sx={{
@@ -547,6 +594,14 @@ const NewsPage = () => {
                           '&:hover': { backgroundColor: HOVER_BG, '& .MuiTableCell-root': { color: TEXT_PRIMARY } }
                         }}
                       >
+                        <TableCell>
+                          <IconButton onClick={() => handleMove(newsItem.id, 'up')} disabled={index === 0} size="small">
+                            <ArrowUpwardIcon fontSize="inherit" />
+                          </IconButton>
+                          <IconButton onClick={() => handleMove(newsItem.id, 'down')} disabled={index === news.length - 1} size="small">
+                            <ArrowDownwardIcon fontSize="inherit" />
+                          </IconButton>
+                        </TableCell>
                         <TableCell component="th" scope="row">
                           {newsItem.title}
                         </TableCell>
@@ -556,7 +611,6 @@ const NewsPage = () => {
                             {newsItem.link_url ? "Ver Notícia" : "N/A"}
                           </Link>
                         </TableCell>
-                        <TableCell>{new Date(newsItem.created_at).toLocaleDateString()}</TableCell>
                         <TableCell align="right">
                           <Button
                             variant="text"

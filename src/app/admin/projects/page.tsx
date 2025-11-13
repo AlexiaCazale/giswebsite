@@ -23,11 +23,14 @@ import {
   CircularProgress,
   SelectChangeEvent,
   Box,
+  IconButton,
 } from "@mui/material";
 import {
   AddCircleOutline as PlusCircleIcon,
   Edit as EditIcon,
   Delete as Trash2Icon,
+  ArrowUpward as ArrowUpwardIcon,
+  ArrowDownward as ArrowDownwardIcon,
 } from "@mui/icons-material";
 import { showSuccess, showError } from "@/utils/toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +51,7 @@ interface ProjectItem {
   images?: string; // JSON string of string[] para galeria
   created_at: string;
   user_id: string;
+  display_order: number;
 }
 
 // Definição manual das cores para TEMA ESCURO SUAVE (match AdminLayout/Dashboard)
@@ -154,7 +158,7 @@ const ProjectsPage = () => {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<ProjectItem | null>(null);
-  const [newProjectData, setNewProjectData] = useState<Omit<ProjectItem, "id" | "created_at" | "user_id"> & { id?: string }>(
+  const [newProjectData, setNewProjectData] = useState<Omit<ProjectItem, "id" | "created_at" | "user_id" | "display_order"> & { id?: string }>(
     { name: "", description: "", date: "", cover_image: "", images: "" }
   );
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
@@ -182,7 +186,7 @@ const ProjectsPage = () => {
       .from("projects")
       .select("*")
       .eq("user_id", user.user.id)
-      .order("created_at", { ascending: false });
+      .order("display_order", { ascending: true });
 
     if (error) {
       showError("Erro ao buscar projetos: " + error.message);
@@ -330,13 +334,29 @@ const ProjectsPage = () => {
         fetchProjects();
       }
     } else {
+      const { data: maxOrderData, error: maxOrderError } = await supabase
+        .from('projects')
+        .select('display_order')
+        .eq('user_id', user.user.id)
+        .order('display_order', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (maxOrderError && maxOrderError.code !== 'PGRST116') {
+        showError("Erro ao determinar a ordem do novo projeto.");
+        return;
+      }
+
+      const newOrder = (maxOrderData?.display_order || 0) + 1;
+
       const { error } = await supabase.from("projects").insert({
         user_id: user.user.id,
         name: newProjectData.name,
         description: newProjectData.description,
         date: newProjectData.date,
-        cover_image: finalCoverImageUrl, // Insere a capa
-        images: imagesJsonString, // Insere a galeria
+        cover_image: finalCoverImageUrl,
+        images: imagesJsonString,
+        display_order: newOrder,
       });
 
       if (error) {
@@ -441,6 +461,35 @@ const ProjectsPage = () => {
     }));
     // Limpar erro específico ao digitar
     setFormErrors(prev => ({ ...prev, [name as string]: "" }));
+  };
+
+  const handleMove = async (projectId: string, direction: 'up' | 'down') => {
+    const projectIndex = projects.findIndex(p => p.id === projectId);
+    if (projectIndex === -1) return;
+
+    const project = projects[projectIndex];
+    const neighborIndex = direction === 'up' ? projectIndex - 1 : projectIndex + 1;
+
+    if (neighborIndex < 0 || neighborIndex >= projects.length) return;
+
+    const neighbor = projects[neighborIndex];
+
+    const { error: projectUpdateError } = await supabase
+      .from('projects')
+      .update({ display_order: neighbor.display_order })
+      .eq('id', project.id);
+
+    const { error: neighborUpdateError } = await supabase
+      .from('projects')
+      .update({ display_order: project.display_order })
+      .eq('id', neighbor.id);
+
+    if (projectUpdateError || neighborUpdateError) {
+      showError("Erro ao reordenar projeto.");
+    } else {
+      showSuccess("Projeto reordenado.");
+      fetchProjects();
+    }
   };
 
   return (
@@ -599,8 +648,8 @@ const ProjectsPage = () => {
                 <Table>
                   <TableHead>
                     <TableRow>
+                      <TableCell>Ordem</TableCell>
                       <TableCell>Nome</TableCell>
-                      <TableCell>Descrição</TableCell>
                       <TableCell>Data</TableCell>
                       <TableCell>Capa</TableCell>
                       <TableCell>Galeria</TableCell>
@@ -608,7 +657,7 @@ const ProjectsPage = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {projects.map((project) => (
+                    {projects.map((project, index) => (
                       <TableRow 
                         key={project.id} 
                         sx={{ 
@@ -616,10 +665,17 @@ const ProjectsPage = () => {
                             '&:hover': { backgroundColor: HOVER_BG, '& .MuiTableCell-root': { color: TEXT_PRIMARY } }
                         }}
                       >
+                        <TableCell>
+                          <IconButton onClick={() => handleMove(project.id, 'up')} disabled={index === 0} size="small">
+                            <ArrowUpwardIcon fontSize="inherit" />
+                          </IconButton>
+                          <IconButton onClick={() => handleMove(project.id, 'down')} disabled={index === projects.length - 1} size="small">
+                            <ArrowDownwardIcon fontSize="inherit" />
+                          </IconButton>
+                        </TableCell>
                         <TableCell component="th" scope="row">
                           {project.name}
                         </TableCell>
-                        <TableCell>{project.description || "N/A"}</TableCell>
                         <TableCell>{new Date(project.date).toLocaleDateString()}</TableCell>
                         <TableCell>{project.cover_image ? "Sim" : "Não"}</TableCell>
                         <TableCell>{project.images && JSON.parse(project.images).length > 0 ? "Sim" : "Não"}</TableCell>

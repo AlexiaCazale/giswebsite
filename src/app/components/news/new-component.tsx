@@ -26,7 +26,7 @@ export default function NewsPage() {
       const { data, error } = await supabase
         .from("news")
         .select("id, title, author, link_url, image, created_at")
-        .order("created_at", { ascending: false });
+        .order("display_order", { ascending: true });
 
       if (error) {
         showError("Erro ao buscar notícias: " + error.message);

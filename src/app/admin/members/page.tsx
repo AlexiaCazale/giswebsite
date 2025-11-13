@@ -22,11 +22,14 @@ import {
   Paper,
   CircularProgress,
   Box,
+  IconButton,
 } from "@mui/material";
 import {
   AddCircleOutline as PlusCircleIcon,
   Edit as EditIcon,
   Delete as Trash2Icon,
+  ArrowUpward as ArrowUpwardIcon,
+  ArrowDownward as ArrowDownwardIcon,
 } from "@mui/icons-material";
 import { showSuccess, showError } from "@/utils/toast";
 import {
@@ -34,16 +37,17 @@ import {
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
 import { supabase } from "@/integrations/supabase/client";
-import ImageUpload from "@/app/components/admin/ImageUpload"; // Importar o novo componente
-import { v4 as uuidv4 } from "uuid"; // Importar uuid para nomes de arquivos únicos
+import ImageUpload from "@/app/components/admin/ImageUpload";
+import { v4 as uuidv4 } from "uuid";
 
 interface Member {
   id: string;
   name: string;
-  function: string; // Corresponds to 'role' in mock data, 'function' in DB
-  image?: string; // Optional image URL
+  function: string;
+  image?: string;
   created_at: string;
-  user_id: string; // Adicionado user_id para corresponder ao DB
+  user_id: string;
+  display_order: number;
 }
 
 const BACKGROUND_DEFAULT = "#2b2f3d";
@@ -145,13 +149,12 @@ const MembersPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [newMemberData, setNewMemberData] = useState<
-    Omit<Member, "id" | "created_at" | "user_id"> & { id?: string }
+    Omit<Member, "id" | "created_at" | "user_id" | "display_order"> & { id?: string }
   >({ name: "", function: "", image: "" });
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [memberToDeleteId, setMemberToDeleteId] = useState<string | null>(null);
-  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({}); // Estado para erros do formulário
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
-  // Estados para o ImageUpload
   const [selectedNewFiles, setSelectedNewFiles] = useState<File[]>([]);
   const [currentImageUrlsForUpload, setCurrentImageUrlsForUpload] = useState<
     string[]
@@ -170,7 +173,7 @@ const MembersPage = () => {
       .from("members")
       .select("*")
       .eq("user_id", user.user.id)
-      .order("created_at", { ascending: false });
+      .order("display_order", { ascending: true });
 
     if (error) {
       showError("Erro ao buscar membros: " + error.message);
@@ -184,7 +187,6 @@ const MembersPage = () => {
     fetchMembers();
   }, []);
 
-  // Função de validação
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
     if (!newMemberData.name.trim()) {
@@ -200,10 +202,10 @@ const MembersPage = () => {
   const uploadImage = async (file: File, userId: string): Promise<string | null> => {
     const fileExtension = file.name.split(".").pop();
     const fileName = `${uuidv4()}.${fileExtension}`;
-    const filePath = `${userId}/${fileName}`; // Pasta por user_id
+    const filePath = `${userId}/${fileName}`;
 
     const { data, error } = await supabase.storage
-      .from("member-images") // Nome do bucket para imagens de membros
+      .from("member-images")
       .upload(filePath, file, {
         cacheControl: "3600",
         upsert: false,
@@ -214,7 +216,6 @@ const MembersPage = () => {
       return null;
     }
 
-    // Retorna a URL pública da imagem
     const { data: publicUrlData } = supabase.storage
       .from("member-images")
       .getPublicUrl(filePath);
@@ -236,20 +237,16 @@ const MembersPage = () => {
 
     let imageUrl: string | null = newMemberData.image || null;
 
-    // Se houver novos arquivos selecionados, faça o upload do primeiro (apenas um para membros)
     if (selectedNewFiles.length > 0) {
       const uploadedUrl = await uploadImage(selectedNewFiles[0], user.user.id);
       if (uploadedUrl) {
         imageUrl = uploadedUrl;
       } else {
-        // Se o upload falhar, não continue com a operação de salvar
         return;
       }
     } else if (currentImageUrlsForUpload.length > 0) {
-      // Se não houver novos arquivos, mas houver URLs existentes (que não foram removidas)
       imageUrl = currentImageUrlsForUpload[0];
     } else {
-      // Se não houver novos arquivos nem URLs existentes, a imagem é nula
       imageUrl = null;
     }
 
@@ -259,7 +256,7 @@ const MembersPage = () => {
         .update({
           name: newMemberData.name,
           function: newMemberData.function,
-          image: imageUrl, // Usar a URL da imagem
+          image: imageUrl,
         })
         .eq("id", editingMember.id)
         .eq("user_id", user.user.id);
@@ -271,11 +268,27 @@ const MembersPage = () => {
         fetchMembers();
       }
     } else {
+      const { data: maxOrderData, error: maxOrderError } = await supabase
+        .from('members')
+        .select('display_order')
+        .eq('user_id', user.user.id)
+        .order('display_order', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (maxOrderError && maxOrderError.code !== 'PGRST116') {
+        showError("Erro ao determinar a ordem do novo membro.");
+        return;
+      }
+
+      const newOrder = (maxOrderData?.display_order || 0) + 1;
+
       const { error } = await supabase.from("members").insert({
         user_id: user.user.id,
         name: newMemberData.name,
         function: newMemberData.function,
-        image: imageUrl, // Usar a URL da imagem
+        image: imageUrl,
+        display_order: newOrder,
       });
 
       if (error) {
@@ -288,9 +301,9 @@ const MembersPage = () => {
     setIsDialogOpen(false);
     setEditingMember(null);
     setNewMemberData({ name: "", function: "", image: "" });
-    setSelectedNewFiles([]); // Limpar arquivos selecionados
-    setCurrentImageUrlsForUpload([]); // Limpar URLs existentes
-    setFormErrors({}); // Limpar erros do formulário
+    setSelectedNewFiles([]);
+    setCurrentImageUrlsForUpload([]);
+    setFormErrors({});
   };
 
   const handleEditClick = (member: Member) => {
@@ -300,10 +313,9 @@ const MembersPage = () => {
       function: member.function,
       image: member.image || "",
     });
-    // Preencher o ImageUpload com a URL existente
     setCurrentImageUrlsForUpload(member.image ? [member.image] : []);
-    setSelectedNewFiles([]); // Limpar quaisquer arquivos novos pré-selecionados
-    setFormErrors({}); // Limpar erros do formulário
+    setSelectedNewFiles([]);
+    setFormErrors({});
     setIsDialogOpen(true);
   };
 
@@ -320,16 +332,14 @@ const MembersPage = () => {
         return;
       }
 
-      // Opcional: Excluir imagem do storage se houver
       const memberToDelete = members.find(m => m.id === memberToDeleteId);
       if (memberToDelete?.image) {
-        const filePath = memberToDelete.image.split('/').slice(-2).join('/'); // Extrai 'user_id/filename.ext'
+        const filePath = memberToDelete.image.split('/').slice(-2).join('/');
         const { error: deleteImageError } = await supabase.storage
           .from('member-images')
           .remove([filePath]);
         if (deleteImageError) {
           console.error("Erro ao excluir imagem do storage:", deleteImageError.message);
-          // Não mostramos erro para o usuário final, pois a exclusão do membro é mais importante
         }
       }
 
@@ -353,8 +363,36 @@ const MembersPage = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setNewMemberData((prev) => ({ ...prev, [id]: value }));
-    // Limpar erro específico ao digitar
     setFormErrors(prev => ({ ...prev, [id]: "" }));
+  };
+
+  const handleMove = async (memberId: string, direction: 'up' | 'down') => {
+    const memberIndex = members.findIndex(m => m.id === memberId);
+    if (memberIndex === -1) return;
+
+    const member = members[memberIndex];
+    const neighborIndex = direction === 'up' ? memberIndex - 1 : memberIndex + 1;
+
+    if (neighborIndex < 0 || neighborIndex >= members.length) return;
+
+    const neighbor = members[neighborIndex];
+
+    const { error: memberUpdateError } = await supabase
+      .from('members')
+      .update({ display_order: neighbor.display_order })
+      .eq('id', member.id);
+
+    const { error: neighborUpdateError } = await supabase
+      .from('members')
+      .update({ display_order: member.display_order })
+      .eq('id', neighbor.id);
+
+    if (memberUpdateError || neighborUpdateError) {
+      showError("Erro ao reordenar membro.");
+    } else {
+      showSuccess("Membro reordenado.");
+      fetchMembers();
+    }
   };
 
   return (
@@ -377,7 +415,7 @@ const MembersPage = () => {
               setNewMemberData({ name: "", function: "", image: "" });
               setSelectedNewFiles([]);
               setCurrentImageUrlsForUpload([]);
-              setFormErrors({}); // Limpar erros do formulário
+              setFormErrors({});
               setIsDialogOpen(true);
             }}
             sx={{
@@ -428,13 +466,12 @@ const MembersPage = () => {
                 error={!!formErrors.function}
                 helperText={formErrors.function}
               />
-              {/* Componente ImageUpload */}
               <ImageUpload
                 label="Imagem do Membro"
                 initialImageUrls={currentImageUrlsForUpload}
                 onImageUrlsChange={setCurrentImageUrlsForUpload}
                 onNewFilesChange={setSelectedNewFiles}
-                multiple={false} // Apenas uma imagem para membro
+                multiple={false}
               />
             </DialogContent>
 
@@ -500,6 +537,7 @@ const MembersPage = () => {
                 <Table>
                   <TableHead>
                     <TableRow>
+                      <TableCell>Ordem</TableCell>
                       <TableCell>Nome</TableCell>
                       <TableCell>Função</TableCell>
                       <TableCell>Data de Entrada</TableCell>
@@ -507,7 +545,7 @@ const MembersPage = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {members.map((member) => (
+                    {members.map((member, index) => (
                       <TableRow
                         key={member.id}
                         sx={{
@@ -518,6 +556,14 @@ const MembersPage = () => {
                           },
                         }}
                       >
+                        <TableCell>
+                          <IconButton onClick={() => handleMove(member.id, 'up')} disabled={index === 0} size="small">
+                            <ArrowUpwardIcon fontSize="inherit" />
+                          </IconButton>
+                          <IconButton onClick={() => handleMove(member.id, 'down')} disabled={index === members.length - 1} size="small">
+                            <ArrowDownwardIcon fontSize="inherit" />
+                          </IconButton>
+                        </TableCell>
                         <TableCell component="th" scope="row">
                           {member.name}
                         </TableCell>

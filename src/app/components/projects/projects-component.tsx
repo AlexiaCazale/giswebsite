@@ -28,7 +28,7 @@ export default function Projects() {
       const { data, error } = await supabase
         .from("projects")
         .select("id, name, description, cover_image")
-        .order("created_at", { ascending: false });
+        .order("display_order", { ascending: true });
 
       if (error) {
         showError("Erro ao buscar projetos: " + error.message);
@@ -59,7 +59,7 @@ export default function Projects() {
 
   return (
     <React.Fragment>
-      <div className="flex md:flex-row flex-col bg-[#2f3e43] min-h-screen w-full p-[30px] md:px-16 items-center justify-center" id="projetos">
+      <div className="flex md:flex-row flex-col bg-[#2f3e43] min-h-screen w-full p-[30px] md:px-16 items-start justify-between" id="projetos">
         <div className="flex flex-col w-full xl:w-2/3 justify-center gap-6 text-[#f4f0e5]">
           <div>
             <h1 className=" text-center md:text-start">Projetos</h1>

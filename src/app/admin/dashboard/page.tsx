@@ -14,9 +14,8 @@ import Avatar from "@mui/material/Avatar";
 import {
   Group as UsersIcon,
   Folder as FolderKanbanIcon,
-  BarChart as BarChart2Icon,
-  CheckCircleOutline as CheckCircleIcon,
   Newspaper as NewspaperIcon,
+  Email as EmailIcon,
   ArrowOutward as ArrowUpRightIcon,
 } from "@mui/icons-material";
 import Link from "next/link";
@@ -62,8 +61,8 @@ const DashboardPage = () => {
   const [stats, setStats] = useState({
     totalMembers: 0,
     totalProjects: 0,
-    activeProjects: 0,
-    completedProjects: 0,
+    totalNews: 0,
+    unreadMessages: 0,
   });
   const [recentMembers, setRecentMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,31 +95,48 @@ const DashboardPage = () => {
             .limit(3);
 
         // Fetch Projetos
-        const { data: allProjects, error: projectsError } = await supabase
+        const { count: projectsCount, error: projectsError } = await supabase
           .from("projects")
-          .select("id, date")
+          .select("*", { count: "exact", head: true })
           .eq("user_id", user.id);
 
-        if (membersError || recentMembersError || projectsError) {
+        // Fetch Notícias
+        const { count: newsCount, error: newsError } = await supabase
+          .from("news")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", user.id);
+
+        // Fetch Mensagens Não Lidas
+        const { count: unreadMessagesCount, error: messagesError } =
+          await supabase
+            .from("contact_messages")
+            .select("*", { count: "exact", head: true })
+            .eq("is_read", false);
+
+        if (
+          membersError ||
+          recentMembersError ||
+          projectsError ||
+          newsError ||
+          messagesError
+        ) {
           console.error(
             "Supabase error:",
-            membersError || recentMembersError || projectsError
+            membersError ||
+              recentMembersError ||
+              projectsError ||
+              newsError ||
+              messagesError
           );
           showError("Erro ao buscar dados do dashboard.");
           return;
         }
 
-        const now = new Date();
-        const completedProjects =
-          allProjects?.filter((p) => new Date(p.date) < now) || [];
-        const activeProjects =
-          allProjects?.filter((p) => new Date(p.date) >= now) || [];
-
         setStats({
           totalMembers: membersCount || 0,
-          totalProjects: allProjects?.length || 0,
-          activeProjects: activeProjects.length,
-          completedProjects: completedProjects.length,
+          totalProjects: projectsCount || 0,
+          totalNews: newsCount || 0,
+          unreadMessages: unreadMessagesCount || 0,
         });
 
         setRecentMembers((recentMembersData as Member[]) || []);
@@ -229,37 +245,11 @@ const DashboardPage = () => {
                 <CardHeader
                   title={
                     <Typography variant="subtitle2" fontWeight="medium">
-                      Projetos Ativos
+                      Total de Notícias
                     </Typography>
                   }
                   action={
-                    <BarChart2Icon
-                      sx={{ color: "hsl(var(--vibrant-purple))" }}
-                    />
-                  }
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    pb: 1,
-                  }}
-                />
-                <CardContent>
-                  <Typography variant="h5" fontWeight="bold">
-                    {stats.activeProjects}
-                  </Typography>
-                </CardContent>
-              </Card>
-              <Card sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}>
-                <CardHeader
-                  title={
-                    <Typography variant="subtitle2" fontWeight="medium">
-                      Projetos Concluídos
-                    </Typography>
-                  }
-                  action={
-                    <CheckCircleIcon
+                    <NewspaperIcon
                       sx={{ color: "hsl(var(--vibrant-green))" }}
                     />
                   }
@@ -273,7 +263,31 @@ const DashboardPage = () => {
                 />
                 <CardContent>
                   <Typography variant="h5" fontWeight="bold">
-                    {stats.completedProjects}
+                    {stats.totalNews}
+                  </Typography>
+                </CardContent>
+              </Card>
+              <Card sx={{ bgcolor: BACKGROUND_PAPER, color: TEXT_PRIMARY }}>
+                <CardHeader
+                  title={
+                    <Typography variant="subtitle2" fontWeight="medium">
+                      Mensagens Não Lidas
+                    </Typography>
+                  }
+                  action={
+                    <EmailIcon sx={{ color: "hsl(var(--vibrant-purple))" }} />
+                  }
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    pb: 1,
+                  }}
+                />
+                <CardContent>
+                  <Typography variant="h5" fontWeight="bold">
+                    {stats.unreadMessages}
                   </Typography>
                 </CardContent>
               </Card>

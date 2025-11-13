@@ -40,7 +40,7 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
       const { data, error } = await supabase
         .from("projects")
         .select("id, name, description, cover_image")
-        .order("created_at", { ascending: false });
+        .order("display_order", { ascending: true });
 
       if (error) {
         showError("Erro ao buscar projetos: " + error.message);
@@ -89,7 +89,7 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
         .from("projects")
         .select("id, name, description, cover_image")
         .neq("id", projectId)
-        .order("created_at", { ascending: false });
+        .order("display_order", { ascending: true });
 
       if (allProjectsError) {
         showError("Erro ao buscar outros projetos: " + allProjectsError.message);
