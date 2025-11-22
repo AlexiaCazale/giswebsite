@@ -13,7 +13,7 @@ export default function About() {
 
     return (
         <React.Fragment>
-            <div className="md:flex lg:flex-row flex-col justify-between bg-[#f7e9e4] sm:w-[100%] xl:h-screen xl:w-screen gap-6 p-[30px] md:px-16" id="about">
+            <div className="md:flex lg:flex-row flex-col justify-between bg-[#f7e9e4] sm:w-[100%] min-h-screen gap-6 p-[30px] md:px-16" id="about">
                 <div className="flex flex-col w-[100%] justify-center gap-4">
 
                     <h1 className="text-center md:text-start">Sobre nós</h1>

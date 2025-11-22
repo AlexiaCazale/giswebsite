@@ -54,26 +54,26 @@ function DynamicSlider({ slides, showButton = true }: DynamicSliderProps) {
   const linkTarget = showButton ? "_blank" : undefined;
 
   return (
-    <div className="slider-container w-full max-w-7xl">
-      <Slider {...settings}>
+    <div className="slider-container w-full max-w-7xl mx-auto">
+      <Slider {...settings} className="display-grid justify-start">
         {slides.map((slide) => (
           <div key={slide.id} className="px-2">
             <div className={cardClasses}>
               <Link href={slide.linkUrl} target={linkTarget} rel={showButton ? "noopener noreferrer" : ""}>
-                  <div className={imageContainerClasses}>
-                    {slide.imageUrl ? (
-                      <Image
-                        src={slide.imageUrl}
-                        alt={`Imagem para ${slide.title}`}
-                        layout="fill"
-                        objectFit="cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
-                        Sem Imagem
-                      </div>
-                    )}
-                  </div>
+                <div className={imageContainerClasses}>
+                  {slide.imageUrl ? (
+                    <Image
+                      src={slide.imageUrl}
+                      alt={`Imagem para ${slide.title}`}
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+                      Sem Imagem
+                    </div>
+                  )}
+                </div>
               </Link>
 
               {showButton ? (
@@ -89,9 +89,9 @@ function DynamicSlider({ slides, showButton = true }: DynamicSliderProps) {
                 </div>
               ) : (
                 <div className="p-6 flex justify-center items-center mt-auto text-center">
-                    <Link href={slide.linkUrl}>
-                        <p className="font-bold text-gray-800">{slide.title}</p>
-                    </Link>
+                  <Link href={slide.linkUrl}>
+                    <p className="font-bold text-gray-800">{slide.title}</p>
+                  </Link>
                 </div>
               )}
             </div>

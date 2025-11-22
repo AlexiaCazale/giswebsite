@@ -6,21 +6,19 @@ import SlideComponent, { ISlide } from "./slide-component";
 import { supabase } from "@/integrations/supabase/client";
 import { showError } from "@/utils/toast";
 
-// Hardcoded Professor Cida data
 const cidaMember: ISlide = {
-  id: "cida-zem", // Unique ID for Cida
-  name: "Profª Dra. Aparecia Zem Lopes",
+  id: "cida-zem", 
+  name: "Profª. Drª. Aparecida Maria Zem Lopes ",
   description: "Nossa Guia e Inspiração",
   imgUrl: "/members/cida.jpeg",
   alt: "Profª Cida Zem",
 };
 
-// Interface for Supabase member data (corrigida para corresponder à query)
 interface SupabaseMember {
   id: string;
   name: string;
-  function: string; // Corresponds to 'description' in ISlide
-  image?: string; // Corresponds to 'imgUrl' in ISlide
+  function: string; 
+  image?: string; 
 }
 
 export default function Member() {
@@ -37,15 +35,15 @@ export default function Member() {
 
       if (error) {
         showError("Erro ao buscar membros: " + error.message);
-        setMembersList([cidaMember]); // Fallback to only Cida if fetch fails
+        setMembersList([cidaMember]); 
       } else {
         const fetchedSlides: ISlide[] = data
-          .filter((member: SupabaseMember) => member.name !== cidaMember.name) // Ensure Cida is not duplicated if she's in DB
+          .filter((member: SupabaseMember) => member.name !== cidaMember.name) 
           .map((member: SupabaseMember) => ({
             id: member.id,
             name: member.name,
             description: member.function,
-            imgUrl: member.image || "/members/default.jpeg", // Use a default image if none is provided
+            imgUrl: member.image || "/members/default.jpeg", 
             alt: member.name,
           }));
         setMembersList([cidaMember, ...fetchedSlides]);
@@ -58,7 +56,7 @@ export default function Member() {
 
   return (
     <React.Fragment>
-      <div className="flex bg-[#f2e4db] w-[100%] h-[100%] xl:w-screen p-[30px] md:px-16" id="membros">
+      <div className="flex bg-[#f2e4db] w-[100%] h-[100%] p-[30px] md:px-16" id="membros">
         <div className="hidden md:flex relative h-screen lg:w-1/3">
           <Image
             src={"/floral-9190055.svg"}

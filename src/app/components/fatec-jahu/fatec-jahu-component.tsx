@@ -31,7 +31,7 @@ export default function FatecJahu() {
   return (
     <React.Fragment>
       <div
-        className="lg:flex md:flex-row flex-col h-[100%] lg-[h-100vh] bg-[#d1af65] xl:h-screen md:w-[100%] p-[30px] md:px-16"
+        className="lg:flex md:flex-row flex-col h-[100%] min-h-screen bg-[#d1af65] md:w-[100%] p-[30px] md:px-16"
         id="fatec-jahu"
       >
         <div className="hidden lg:flex relative h-screen md:w-[100%] lg:w-1/2">
