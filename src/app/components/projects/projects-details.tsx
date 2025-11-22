@@ -112,7 +112,7 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-4 w-full min-h-screen p-[30px] md:px-16 bg-[#1a1a1a] text-white items-center justify-center">
+      <div className="flex flex-col gap-4 w-full min-h-screen py-[60px] px-[30px] md:px-16 bg-[#1a1a1a] text-white items-center justify-center">
         <Typography variant="h6" color="white">Carregando projeto...</Typography>
       </div>
     );
@@ -120,7 +120,7 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
 
   if (!project) {
     return (
-      <div className="flex flex-col gap-4 w-full min-h-screen p-[30px] md:px-16 bg-[#1a1a1a] text-white items-center justify-center">
+      <div className="flex flex-col gap-4 w-full min-h-screen py-[60px] px-[30px] md:px-16 bg-[#1a1a1a] text-white items-center justify-center">
         <Typography variant="h6" color="white">Projeto não encontrado.</Typography>
       </div>
     );
@@ -144,7 +144,7 @@ export default function ProjectDetails({ projectId }: ProjectDetailsProps) {
   }));
 
   return (
-    <div className="flex flex-col gap-4 w-full min-h-screen p-[30px] md:px-16 bg-[#1a1a1a] text-white items-center justify-center">
+    <div className="flex flex-col gap-4 w-full min-h-screen py-[60px] px-[30px] md:px-16 bg-[#1a1a1a] text-white items-center justify-center">
       <div
         className="mt-[10vh] flex flex-col w-full max-w-6xl justify-center"
         id="welcome"

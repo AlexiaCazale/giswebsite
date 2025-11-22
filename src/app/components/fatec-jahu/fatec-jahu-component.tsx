@@ -1,7 +1,6 @@
 "use client";
 
 import SpotlightCard from "@/components/SpotlightCard";
-import StarBorder from "@/components/StarBorder";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useIsMobile } from "@/app/hooks/use-mobile";
@@ -31,7 +30,7 @@ export default function FatecJahu() {
   return (
     <React.Fragment>
       <div
-        className="lg:flex md:flex-row flex-col h-[100%] min-h-screen bg-[#d1af65] md:w-[100%] p-[30px] md:px-16"
+        className="lg:flex md:flex-row flex-col h-[100%] min-h-screen bg-[#d1af65] md:w-[100%] py-[60px] px-[30px] md:px-16"
         id="fatec-jahu"
       >
         <div className="hidden lg:flex relative h-screen md:w-[100%] lg:w-1/2">
@@ -44,9 +43,7 @@ export default function FatecJahu() {
           />
         </div>
         <div className="flex flex-col w-[100%] justify-center gap-4">
-          <h1 className="text-center md:text-start">
-            Fatec Jahu
-          </h1>
+          <h1 className="text-center md:text-start">Fatec Jahu</h1>
 
           <div className="flex text-center md:text-start gap-6 flex-col items-center">
             <p>
@@ -66,8 +63,14 @@ export default function FatecJahu() {
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="flex items-center justify-center w-full px-4 py-3 mt-2 bg-[#fff3c6] p-5 rounded-[1.5rem]"
               >
-                <span>{isExpanded ? "Ocultar Cursos" : "Ver Cursos Oferecidos"}</span>
-                {isExpanded ? <ExpandLess className="ml-2" /> : <ExpandMore className="ml-2" />}
+                <span>
+                  {isExpanded ? "Ocultar Cursos" : "Ver Cursos Oferecidos"}
+                </span>
+                {isExpanded ? (
+                  <ExpandLess className="ml-2" />
+                ) : (
+                  <ExpandMore className="ml-2" />
+                )}
               </button>
             </div>
 
@@ -79,13 +82,15 @@ export default function FatecJahu() {
                   : "max-h-0 opacity-0"
               }`}
             >
-              <div className="grid items-center w-[100%] gap-4 grid-cols-[repeat(auto-fit,minmax(300px,1fr))] pt-4">
+              <div className="grid w-[100%] gap-4 grid-cols-[repeat(auto-fit,minmax(300px,1fr))] pt-4">
                 {data.map((e, i) => (
-                  <div className="min-h-[60px] max-h-[90px]" key={i}>
-                    <div className="bg-[#fff3c6] p-5 rounded-[1rem]">
-                      {e}
-                    </div>
-                  </div>
+                  <SpotlightCard
+                    key={i}
+                    className="bg-[#fff3c6] rounded-[1rem] text-black items-center p-5 border-none"
+                    spotlightColor="rgba(255, 255, 255, 0.15)"
+                  >
+                    <span className="font-medium text-center">{e}</span>
+                  </SpotlightCard>
                 ))}
               </div>
             </div>

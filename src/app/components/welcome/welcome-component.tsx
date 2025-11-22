@@ -5,7 +5,7 @@ import TextPressure from "@/components/TextPressure";
 export default function Welcome() {
   return (
     <React.Fragment>
-      <div className="flex w-[100%] h-[100%] py-[30px] min-h-screen p-[30px] md:px-16">
+      <div className="flex w-[100%] h-[100%] py-[60px] min-h-screen px-[30px] md:px-16">
         <div className="relative h-screen w-1/2">
           <Image
             src="/floral-9190057.svg"

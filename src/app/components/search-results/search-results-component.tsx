@@ -25,6 +25,7 @@ import {
   ShowChartOutlined,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
+  ConstructionOutlined,
 } from "@mui/icons-material";
 
 // Dynamically import Slider to ensure it only runs on the client-side
@@ -187,8 +188,9 @@ export default function SearchResult() {
         <p className="text-gray-700 mb-4">
           Comparativo entre os resultados do Ano 1 e Ano 2.
         </p>
-        <div className="w-full h-auto min-h-[22rem] bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-          (Componente de Gráfico 3)
+        <div className="w-full h-auto min-h-[22rem] bg-gray-100 rounded-lg flex flex-col items-center justify-center text-gray-500 gap-4">
+          <ConstructionOutlined sx={{ fontSize: 48, color: 'text.secondary' }} />
+          <p className="text-lg text-gray-600">Gráfico em construção...</p>
         </div>
       </div>
     ),
@@ -197,7 +199,7 @@ export default function SearchResult() {
   return (
     <React.Fragment>
       <div
-        className="flex flex-col bg-[#F9F4F4] min-h-screen p-[30px] py-[0px 20px] md:px-16 justify-center items-center pt-20"
+        className="flex flex-col bg-[#F9F4F4] min-h-screen py-[60px] px-[30px] py-[0px 20px] md:px-16 justify-center items-center pt-20"
         id="resultados"
       >
         <div className="text-center gap-4 mb-10">

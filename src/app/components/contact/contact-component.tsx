@@ -38,7 +38,7 @@ export default function Contact() {
 
   return (
     <React.Fragment>
-      <div className="flex flex-col justify-center items-center h-[100%] w-[100%] gap-4 p-[30px] md:px-16" id="contato">
+      <div className="flex flex-col justify-center items-center h-[100%] min-h-screen w-[100%] gap-4 py-[60px] px-[30px] md:px-16" id="contato">
         <h1 className="text-[#f4f0e5] text-center md:text-start">
           Entre em contato
         </h1>
