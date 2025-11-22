@@ -172,7 +172,6 @@ const MembersPage = () => {
     const { data, error } = await supabase
       .from("members")
       .select("*")
-      .eq("user_id", user.user.id)
       .order("display_order", { ascending: true });
 
     if (error) {
@@ -258,8 +257,7 @@ const MembersPage = () => {
           function: newMemberData.function,
           image: imageUrl,
         })
-        .eq("id", editingMember.id)
-        .eq("user_id", user.user.id);
+        .eq("id", editingMember.id);
 
       if (error) {
         showError("Erro ao atualizar membro: " + error.message);
@@ -271,7 +269,6 @@ const MembersPage = () => {
       const { data: maxOrderData, error: maxOrderError } = await supabase
         .from('members')
         .select('display_order')
-        .eq('user_id', user.user.id)
         .order('display_order', { ascending: false })
         .limit(1)
         .single();
@@ -346,8 +343,7 @@ const MembersPage = () => {
       const { error } = await supabase
         .from("members")
         .delete()
-        .eq("id", memberToDeleteId)
-        .eq("user_id", user.user.id);
+        .eq("id", memberToDeleteId);
 
       if (error) {
         showError("Erro ao excluir membro: " + error.message);

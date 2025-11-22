@@ -83,28 +83,24 @@ const DashboardPage = () => {
         // Fetch Membros
         const { count: membersCount, error: membersError } = await supabase
           .from("members")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id);
+          .select("*", { count: "exact", head: true });
 
         const { data: recentMembersData, error: recentMembersError } =
           await supabase
             .from("members")
             .select("name, function, image")
-            .eq("user_id", user.id)
             .order("created_at", { ascending: false })
             .limit(3);
 
         // Fetch Projetos
         const { count: projectsCount, error: projectsError } = await supabase
           .from("projects")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id);
+          .select("*", { count: "exact", head: true });
 
         // Fetch Notícias
         const { count: newsCount, error: newsError } = await supabase
           .from("news")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id);
+          .select("*", { count: "exact", head: true });
 
         // Fetch Mensagens Não Lidas
         const { count: unreadMessagesCount, error: messagesError } =

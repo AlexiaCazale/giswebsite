@@ -1,20 +1,33 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button, TextField, Typography, Box, Paper, CircularProgress } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Typography,
+  Box,
+  Paper,
+  CircularProgress,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { showSuccess, showError } from "@/utils/toast";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/integrations/supabase/client"; // Importar cliente Supabase
+import { supabase } from "@/integrations/supabase/client";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // Estado de carregamento para o botão
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setLoginError(null); // Limpa erros anteriores
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -22,12 +35,28 @@ const LoginPage = () => {
     });
 
     if (error) {
-      showError("Erro ao fazer login: " + error.message);
+      if (error.message === "Invalid login credentials") {
+        setLoginError(
+          "E-mail ou senha inválidos. Por favor, verifique e tente novamente."
+        );
+      } else {
+        setLoginError(
+          "Ocorreu um erro ao tentar fazer login. Tente novamente mais tarde."
+        );
+      }
+      showError("Falha no login");
     } else {
       showSuccess("Login realizado com sucesso!");
-      router.push("/admin/dashboard"); // Redirecionar após login bem-sucedido
+      router.push("/admin/dashboard");
     }
     setLoading(false);
+  };
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
   };
 
   return (
@@ -59,10 +88,7 @@ const LoginPage = () => {
           {"< Girls In STEM />"}
         </Typography>
 
-        <Typography
-          variant="h6"
-          sx={{ mb: 3 }}
-        >
+        <Typography variant="h6" sx={{ mb: 3 }}>
           Acesse a área administrativa
         </Typography>
 
@@ -107,12 +133,27 @@ const LoginPage = () => {
             fullWidth
             name="password"
             label="Senha"
-            type="password"
+            type={showPassword ? "text" : "password"}
             id="password"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             variant="standard"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                    sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
             sx={{
               mb: 1,
               "& .MuiInputBase-input": {
@@ -135,6 +176,15 @@ const LoginPage = () => {
               },
             }}
           />
+          {loginError && (
+            <Typography
+              color="error"
+              variant="body2"
+              sx={{ mt: 2, textAlign: "center" }}
+            >
+              {loginError}
+            </Typography>
+          )}
           <Button
             type="submit"
             fullWidth
@@ -153,7 +203,11 @@ const LoginPage = () => {
               mt: 3,
             }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Entrar"}
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Entrar"
+            )}
           </Button>
         </Box>
       </Paper>

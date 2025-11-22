@@ -185,7 +185,6 @@ const ProjectsPage = () => {
     const { data, error } = await supabase
       .from("projects")
       .select("*")
-      .eq("user_id", user.user.id)
       .order("display_order", { ascending: true });
 
     if (error) {
@@ -324,8 +323,7 @@ const ProjectsPage = () => {
           cover_image: finalCoverImageUrl, // Atualiza a capa
           images: imagesJsonString, // Atualiza a galeria
         })
-        .eq("id", editingProject.id)
-        .eq("user_id", user.user.id);
+        .eq("id", editingProject.id);
 
       if (error) {
         showError("Erro ao atualizar projeto: " + error.message);
@@ -337,7 +335,6 @@ const ProjectsPage = () => {
       const { data: maxOrderData, error: maxOrderError } = await supabase
         .from('projects')
         .select('display_order')
-        .eq('user_id', user.user.id)
         .order('display_order', { ascending: false })
         .limit(1)
         .single();
@@ -437,8 +434,7 @@ const ProjectsPage = () => {
       const { error } = await supabase
         .from("projects")
         .delete()
-        .eq("id", projectToDeleteId)
-        .eq("user_id", user.user.id);
+        .eq("id", projectToDeleteId);
 
       if (error) {
         showError("Erro ao excluir projeto: " + error.message);

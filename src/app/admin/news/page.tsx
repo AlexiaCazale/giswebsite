@@ -185,7 +185,6 @@ const NewsPage = () => {
     const { data, error } = await supabase
       .from("news")
       .select("*")
-      .eq("user_id", user.user.id)
       .order("display_order", { ascending: true });
 
     if (error) {
@@ -282,8 +281,7 @@ const NewsPage = () => {
           link_url: newNewsData.link_url,
           image: imageUrl, // Usar a URL da imagem
         })
-        .eq("id", editingNews.id)
-        .eq("user_id", user.user.id);
+        .eq("id", editingNews.id);
 
       if (error) {
         showError("Erro ao atualizar notícia: " + error.message);
@@ -295,7 +293,6 @@ const NewsPage = () => {
       const { data: maxOrderData, error: maxOrderError } = await supabase
         .from('news')
         .select('display_order')
-        .eq('user_id', user.user.id)
         .order('display_order', { ascending: false })
         .limit(1)
         .single();
@@ -376,8 +373,7 @@ const NewsPage = () => {
       const { error } = await supabase
         .from("news")
         .delete()
-        .eq("id", newsToDeleteId)
-        .eq("user_id", user.user.id);
+        .eq("id", newsToDeleteId);
 
       if (error) {
         showError("Erro ao excluir notícia: " + error.message);
