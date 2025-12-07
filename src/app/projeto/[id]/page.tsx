@@ -8,7 +8,7 @@ import { useParams } from "next/navigation";
 
 export default function Projeto() {
   const params = useParams();
-  const projectId = Number(params.id); // O ID vem da URL
+  const projectId = Number(params.id);
 
   if (isNaN(projectId)) {
     return <p>ID de projeto inválido.</p>;
@@ -17,7 +17,7 @@ export default function Projeto() {
   return (
     <div >
       <HeaderComponent />
-        <ProjectDetails projectId={projectId} /> {/* Passa o ID para ProjectDetails */}
+        <ProjectDetails projectId={projectId} /> 
       <FooterComponent />
     </div>
   );
