@@ -54,7 +54,7 @@ function DynamicSlider({ slides, showButton = true }: DynamicSliderProps) {
   const linkTarget = showButton ? "_blank" : undefined;
 
   return (
-    <div className="slider-container w-full max-w-7xl mx-auto">
+    <div className="slider-container w-full max-w-7xl">
       <Slider {...settings} className="display-grid justify-start">
         {slides.map((slide) => (
           <div key={slide.id} className="px-2">
